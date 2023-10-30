@@ -128,41 +128,15 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 	}
 }
 
-void readFile(char* filename)
-{
-/*
- You should create a new function readFile that takes a character array
- containing a file name and reads the file into a buffer. After you complete
- your function, you should make it into an interrupt 0x21 call: 
+void readFile(char* filename) {
+    char* buffer[512];
+    int* i;
+	int AX = 3;
+	int BX =  &filename;
+    int CX = &buffer;
+    int DX = &i;
 
- Read File: 
- AX = 3 
- BX = address (HINT: ADDRESS = &POINTER) of character array containing the file name 
- CX = address of a buffer to hold the file 
- DX = address of an integer to hold the number of sectors you read
-
- Your readFile function should work as follows: 
-
- 1. Load the directory sector into a 512 byte character array using readSector 
-
- 2. Go through the directory trying to match the file name. If you do not find
- it, set the number of sectors read to 0 and return. 
-
- 3. Using the sector numbers in the directory, load the file, sector by sector,
- into the buffer array. You should add 512 to the buffer address every time you
- call readSector.  Make sure to increment the number of sectors read as you go.
-
- Hints This part is challenging.  Try using a for loop with an iterator
- fileentry to step through the directory in increments of 32.  Then for each
- file entry, look at the next six characters and compare them to your file name
- parameter.  For example, does filename[0]==dir[fileentry+0],
- filename[1]==dir[fileentry+1], and so on?  If not, move on to the next entry.
- You might use your printChar function to see how many times the for-loop is
- running.
-
- When you find your file, use another for-loop to load it.  Call readSector
- using dir[fileentry+6] as the sector number.  Add 512 to the buffer address.
- Call readSector with dir[fileentry+7].  Repeat this until you reach a sector
- number 0.
- */
+    
 }
+
+
