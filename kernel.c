@@ -10,10 +10,10 @@ void readFile(char* filename);
 
 void main()
 {
-	char line[80];
-	makeInterrupt21();
-	interrupt(0x21, 1, line, 0, 0);
-	interrupt(0x21, 0, line, 0, 0);	
+	//char line[80];
+	//makeInterrupt21();
+	//interrupt(0x21, 1, line, 0, 0);
+	//interrupt(0x21, 0, line, 0, 0);	
 
 	/* Old code for testing
 	char* letters = "Enter a string: \0";
@@ -30,7 +30,17 @@ void main()
 	printString(buffer);
 	*/
 
-	while(1);
+    char buffer[13312];   /*this is the maximum size of a file*/
+	int sectorsRead;
+	makeInterrupt21(); 
+	interrupt(0x21, 3, "messag", buffer, &sectorsRead);   /*read the file into buffer*/ 
+	if (sectorsRead>0)
+		interrupt(0x21, 0, buffer, 0, 0);   /*print out the file*/ 
+	else
+		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  /*no sectors read? then print an error*/
+	while(1);   /*hang up*/ 
+
+	//while(1);
 }
 
 void printString(char* chars)
@@ -130,12 +140,32 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 
 void readFile(char* filename) {
     char* buffer[512];
+    //char* buffer2[512];
     int* i;
-	int AX = 3;
-	int BX =  &filename;
+    int AX = 3;
+	
+    int BX =  &filename;
     int CX = &buffer;
     int DX = &i;
 
+    readSector(buffer, BX);
+
+   // int fileentry = 0;
+    
+   /* for (fileentry = 0; fileentry < 512; fileentry+=32){ //was incrementing i before and not fileentry
+        if (filename[0] == dir[fileentry+0] && filename[1] == dir[fileentry+1] && filename[2] == dir[fileentry+2] && filename[3] == dir[fileentry+3] && filename[4] == dir[fileentry+4] && filename[5] == dir[fileentry+5]) {
+            for (int i = 0; dir[fileentry+i] != 0; i++) {
+                readSector(buffer, dir[fileentry+i]);
+                CX += 512;
+            } 
+       } 
+     }
+   */
+    for (int j = 0; j < 512; j+=32) {
+        
+    }
+
+    
     
 }
 
