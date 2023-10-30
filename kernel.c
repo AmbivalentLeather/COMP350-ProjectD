@@ -10,10 +10,12 @@ void readFile(char* filename);
 
 void main()
 {
-	//char line[80];
-	//makeInterrupt21();
-	//interrupt(0x21, 1, line, 0, 0);
-	//interrupt(0x21, 0, line, 0, 0);	
+	/* Final test code for projB
+	char line[80];
+	makeInterrupt21();
+	interrupt(0x21, 1, line, 0, 0);
+	interrupt(0x21, 0, line, 0, 0);	
+	*/
 
 	/* Old code for testing
 	char* letters = "Enter a string: \0";
@@ -30,15 +32,17 @@ void main()
 	printString(buffer);
 	*/
 
-    char buffer[13312];   /*this is the maximum size of a file*/
+	/*
+	char buffer[13312];   //this is the maximum size of a file
 	int sectorsRead;
 	makeInterrupt21(); 
-	interrupt(0x21, 3, "messag", buffer, &sectorsRead);   /*read the file into buffer*/ 
+	interrupt(0x21, 3, "messag", buffer, &sectorsRead);   //read the file into buffer 
 	if (sectorsRead>0)
-		interrupt(0x21, 0, buffer, 0, 0);   /*print out the file*/ 
+		interrupt(0x21, 0, buffer, 0, 0);   //print out the file 
 	else
-		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  /*no sectors read? then print an error*/
-	while(1);   /*hang up*/ 
+		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  //no sectors read? then print an error
+	while(1);   //hang up
+	*/
 
 	//while(1);
 }
@@ -55,9 +59,9 @@ void printString(char* chars)
 	}
 }
 
-void printChar(char* c)
+void printChar(char* inputChar)
 {
-	char al = c;
+	char al = inputChar;
 	char ah = 0xe;
 	int ax = ah * 256 + al;
 	interrupt(0x10, ax, 0, 0, 0);
@@ -139,34 +143,33 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 }
 
 void readFile(char* filename) {
-    char* buffer[512];
-    //char* buffer2[512];
-    int* i;
-    int AX = 3;
+	int i;
+	for (i = 0; i < 10; ++i){
+		printChar("C");
+	}
+/*
+	char* buffer[512];
+	//char* buffer2[512];
+	int* i;
+	int AX = 3;
+
+	int BX =  &filename;
+	int CX = &buffer;
+	int DX = &i;
 	
-    int BX =  &filename;
-    int CX = &buffer;
-    int DX = &i;
+	readSector(buffer, BX);
 
-    readSector(buffer, BX);
+	int fileentry = 0;
 
-   // int fileentry = 0;
-    
-   /* for (fileentry = 0; fileentry < 512; fileentry+=32){ //was incrementing i before and not fileentry
-        if (filename[0] == dir[fileentry+0] && filename[1] == dir[fileentry+1] && filename[2] == dir[fileentry+2] && filename[3] == dir[fileentry+3] && filename[4] == dir[fileentry+4] && filename[5] == dir[fileentry+5]) {
-            for (int i = 0; dir[fileentry+i] != 0; i++) {
-                readSector(buffer, dir[fileentry+i]);
-                CX += 512;
-            } 
-       } 
-     }
-   */
-    for (int j = 0; j < 512; j+=32) {
-        
-    }
-
-    
-    
+	for (fileentry = 0; fileentry < 512; fileentry+=32){ //was incrementing i before and not fileentry
+		if (filename[0] == dir[fileentry+0] && filename[1] == dir[fileentry+1] && filename[2] == dir[fileentry+2] && filename[3] == dir[fileentry+3] && filename[4] == dir[fileentry+4] && filename[5] == dir[fileentry+5]) {
+			for (int i = 0; dir[fileentry+i] != 0; i++) {
+				readSector(buffer, dir[fileentry+i]);
+                		CX += 512;
+           		} 
+       		} 
+	}
+*/
+	
 }
-
 
