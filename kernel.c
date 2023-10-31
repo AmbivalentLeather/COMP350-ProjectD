@@ -41,10 +41,9 @@ void main()
 		interrupt(0x21, 0, buffer, 0, 0);   //print out the file 
 	else
 		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  //no sectors read? then print an error
-	while(1);   //hang up
 	*/
 
-	//while(1);
+	while(1);	// PLEASE DON'T CHANGE THIS LINE
 }
 
 void printString(char* chars)
@@ -61,7 +60,7 @@ void printString(char* chars)
 
 void printChar(char* inputChar)
 {
-	char al = inputChar;
+	char al = inputChar[0];
 	char ah = 0xe;
 	int ax = ah * 256 + al;
 	interrupt(0x10, ax, 0, 0, 0);
@@ -143,11 +142,7 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 }
 
 void readFile(char* filename) {
-	int i;
-	for (i = 0; i < 10; ++i){
-		printChar("C");
-	}
-/*
+
 	char* buffer[512];
 	//char* buffer2[512];
 	int* i;
@@ -157,19 +152,21 @@ void readFile(char* filename) {
 	int CX = &buffer;
 	int DX = &i;
 	
-	readSector(buffer, BX);
+	readSector(*buffer, BX);
 
-	int fileentry = 0;
+	// dir, as shown in the project notes, is not a command
+	// dir, its symbolic for the directory you're currently in
+	for (int fileentry = 0; fileentry < 512; fileentry += 32){
+		if (filename[0] == dir[fileentry+0] && filename[1] == dir[fileentry+1] 
+				&& filename[2] == dir[fileentry+2] && filename[3] == dir[fileentry+3] 
+				&& filename[4] == dir[fileentry+4] && filename[5] == dir[fileentry+5]) {
 
-	for (fileentry = 0; fileentry < 512; fileentry+=32){ //was incrementing i before and not fileentry
-		if (filename[0] == dir[fileentry+0] && filename[1] == dir[fileentry+1] && filename[2] == dir[fileentry+2] && filename[3] == dir[fileentry+3] && filename[4] == dir[fileentry+4] && filename[5] == dir[fileentry+5]) {
 			for (int i = 0; dir[fileentry+i] != 0; i++) {
 				readSector(buffer, dir[fileentry+i]);
                 		CX += 512;
            		} 
        		} 
 	}
-*/
 	
 }
 
