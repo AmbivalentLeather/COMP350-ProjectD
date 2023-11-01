@@ -17,28 +17,6 @@ int string_compare(char* directory_buffer, int* file_entry, char* string_to_beat
 
 void main()
 {
-	/* Final test code for projB
-	char line[80];
-	makeInterrupt21();
-	interrupt(0x21, 1, line, 0, 0);
-	interrupt(0x21, 0, line, 0, 0);	
-	// */
-
-	/* Old code for testing
-	char* letters = "Enter a string: \0";
-	char input[80];
-	
-	interrupt(0x21, 0, 0, 0, 0);
-
-	printString(letters);
-	readString(input);
-	printString(input);
-
-	char buffer[512];
-	readSector(buffer, 30);
-	printString(buffer);
-	// */
-
 	// /*
 	char str[1];
 	alph = (9, str);
