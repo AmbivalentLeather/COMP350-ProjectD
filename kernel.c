@@ -7,7 +7,7 @@ char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 void readFile(char* filename);
-int string_matcher(int* directory_buffer, int current_string, char* string_to_beat);
+int string_matcher(char* directory_buffer, int current_string, char* string_to_beat);
 
 void main()
 {
@@ -144,9 +144,9 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 
 void readFile(char* filename)
 {	
-	int file_entry;
+	int file_entry = 0;
 	char* file_storage_buffer[512];
-	int* directory_buffer[512];
+	char* directory_buffer[512];
 	int* sectors_read;
 
 	int AX = 3;
@@ -156,33 +156,34 @@ void readFile(char* filename)
 	
 	readSector(*directory_buffer, 2);
 
-	directory_buffer[fileentry + i];
-
-	// dir, as shown in the project notes, is not a command
-	// dir, its symbolic for the directory you're currently in
-	for (file_entry = 0; file_entry < 512; file_entry += 32){
-		if(string_matcher(directory_buffer, current_file, filename)){
-		}
-			for (int i = 0; dir[fileentry+i] != 0; i++) {
-				readSector(file_storage_buffer, dir[fileentry+i]);
-                		CX += 512;
-           		} 
-       		} 
-	}
+	if(string_matcher(*directory_buffer, file_entry, filename)){
+		int i;
+		for (i = 0; directory_buffer[file_entry + 6 + i] != 0; i++) {
+			// WHAT FUCKING BUFFER SHOULD I WRITE TO? CX???
+			readSector(CX , directory_buffer[file_entry + 6 + i]);
+                	CX += 512;
+          	} 
+       	} 
 	
 }
 
-int string_matcher(int* directory_buffer, int current_string, char* string_to_beat)
+int string_matcher(char* directory_buffer, int file_entry, char* string_to_beat)
 {
 	int hope = 0;
-	for(int i = 0; i < 6; ++i) {
-		if(directory_buffer[current_string + i] == string_to_beat[i]){
-			if(hope == 6)
-				return 1;
-			hope++;
+	for (file_entry = 0; file_entry < 512; file_entry += 32){
+		// /*
+		int i;
+		for(i = 0; i < 5; ++i) {
+			if(directory_buffer[file_entry + i] != string_to_beat[i])
+				break;
+			else
+				++hope;
 		}
+		// */
+		if(hope == 6)
+			return 1;
 		else
-			return 0;
+			;
 	}
 
 }
