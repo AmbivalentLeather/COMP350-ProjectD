@@ -1,6 +1,9 @@
 /* Written by: Nick Young, Chase Simao, starting code from Joe Matta
  * Date: October 2023 */
 
+/* K&R Functions */
+void itoa(int n, char s[]);
+
 /* Function initialization */
 void printString(char*);
 void printChar(char*);
@@ -8,7 +11,7 @@ char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 
-void readFile(char* filename, char output_buffer, int* sectorsRead);
+void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int string_compare(char* directory_buffer, int* file_entry, char* string_to_beat);
 
 
@@ -37,6 +40,8 @@ void main()
 	// */
 
 	// /*
+	char str[1];
+	alph = (9, str);
 	char buffer[13312];   //this is the maximum size of a file
 	int sectorsRead;
 	makeInterrupt21(); 
@@ -144,16 +149,13 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 	}
 }
 
-void readFile(char* filename, char output_buffer, int* sectorsRead)
+void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {	
 	char directory_buffer[512];
 	int i = 0;
 	// I only declare the pointer like this so the logic is more clear
 	int file_entry = 0;
 	int* pfile_entry;
-
-	char* ptr;
-	ptr = &output_buffer;
 
 	pfile_entry = &file_entry;
 
@@ -165,8 +167,8 @@ void readFile(char* filename, char output_buffer, int* sectorsRead)
 		while(directory_buffer[*pfile_entry + i] != 0) {
 			printString("About to readSector\r\n");
 
-			readSector(ptr, directory_buffer[*pfile_entry + 6 + i]);
-			ptr += 512;
+			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
+			output_buffer += 512;
 
 			printString("readSector to output buffer done\r\n");
 			++*sectorsRead;
@@ -198,4 +200,21 @@ int string_compare(char* directory_buffer, int* file_entry, char* string_to_beat
 	return 0; // Base case, if the loop above finds nothing, return false
 	// */
 
+}
+
+/* itoa: convert n to characters in s TAKEN FROM K&R */
+void itoa(int n, char s[])
+{
+	int i, sign;
+
+	if ((sign = n) < 0)  /* record sign */
+		n = -n;           /* make n positive */
+		i = 0;
+	do {  /* generate digits in reverse order */
+		s[i++] = n % 10 + '0';  /* get next digit */
+	} while ((n /= 10) > 0);   /* delete it */
+	if (sign < 0)
+		s[i++] = '-';
+	s[i] = '\0';
+	reverse(s);
 }
