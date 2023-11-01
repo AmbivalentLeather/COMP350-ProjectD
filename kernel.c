@@ -12,7 +12,6 @@ void readFile(char* filename, char output_buffer, int* sectorsRead);
 int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat);
 
 
-
 void main()
 {
 	/* Final test code for projB
@@ -158,21 +157,17 @@ void readFile(char* filename, char output_buffer, int* sectorsRead)
 
 	// /*
 	if(string_matcher(directory_buffer, pfile_entry, filename)){
-		printString("String matched\r\n");
-		i = 0;
+//		printString("String matched\r\n");
 		while(directory_buffer[*pfile_entry + i] != 0) {
-			printString("About to readSector\r\n");
-			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
-			printString("readSector to output buffer done\r\n");
+//			printString("About to readSector\r\n");
+			readSector(&output_buffer, directory_buffer[*pfile_entry + 6 + i]);
+//			printString("readSector to output buffer done\r\n");
 			++*sectorsRead;
 			++i;
 		}
-       	} 
-
-	else
+       	} else
 		sectorsRead = 0;
 	// */
-	
 }
 
 int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat)
