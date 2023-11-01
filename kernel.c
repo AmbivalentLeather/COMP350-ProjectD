@@ -9,7 +9,7 @@ void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 
 void readFile(char* filename, char output_buffer, int* sectorsRead);
-int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat);
+int string_compare(char* directory_buffer, int* file_entry, char* string_to_beat);
 
 
 void main()
@@ -151,17 +151,22 @@ void readFile(char* filename, char output_buffer, int* sectorsRead)
 	// I only declare the pointer like this so the logic is more clear
 	int file_entry = 0;
 	int* pfile_entry;
+
+	char* ptr;
+	ptr = &output_buffer;
+
 	pfile_entry = &file_entry;
 
 	readSector(directory_buffer, 2);
 
 	// /*
-	if(string_matcher(directory_buffer, pfile_entry, filename)){
+	if(string_compare(directory_buffer, pfile_entry, filename)){
 		printString("String matched\r\n");
 		while(directory_buffer[*pfile_entry + i] != 0) {
 			printString("About to readSector\r\n");
 
-			readSector(&output_buffer, directory_buffer[*pfile_entry + 6 + i]);
+			readSector(ptr, directory_buffer[*pfile_entry + 6 + i]);
+			ptr += 512;
 
 			printString("readSector to output buffer done\r\n");
 			++*sectorsRead;
@@ -172,7 +177,7 @@ void readFile(char* filename, char output_buffer, int* sectorsRead)
 	// */
 }
 
-int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat)
+int string_compare(char* directory_buffer, int* file_entry, char* string_to_beat)
 {
 	// /*
 	int hope = 0;
