@@ -33,7 +33,7 @@ void main()
 	printString(buffer);
 	// */
 
-	/*
+	// /*
 	char buffer[13312];   //this is the maximum size of a file
 	int sectorsRead;
 	makeInterrupt21(); 
@@ -132,11 +132,13 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 	switch(ax)
 	{
 		case 0: printString(bx);
-			      break;
+			break;
 		case 1: readString(bx);
-			      break;
+			break;
 		case 2: readSector(bx, cx);
-			      break;
+			break;
+		case 3: readFile(bx);
+			break;
 		default: printString("Error AX is invalid");
 			 break;
 	}
@@ -171,7 +173,6 @@ int string_matcher(char* directory_buffer, int file_entry, char* string_to_beat)
 {
 	int hope = 0;
 	for (file_entry = 0; file_entry < 512; file_entry += 32){
-		// /*
 		int i;
 		for(i = 0; i < 5; ++i) {
 			if(directory_buffer[file_entry + i] != string_to_beat[i])
