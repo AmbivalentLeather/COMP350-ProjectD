@@ -4,9 +4,10 @@
 void printString(char*);
 void printChar(char*);
 char* readString(char*);
-char* readSector(char*, int);
+void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 void readFile(char* filename);
+int string_matcher(int* directory_buffer, int current_string, char* string_to_beat);
 
 void main()
 {
@@ -15,7 +16,7 @@ void main()
 	makeInterrupt21();
 	interrupt(0x21, 1, line, 0, 0);
 	interrupt(0x21, 0, line, 0, 0);	
-	*/
+	// */
 
 	/* Old code for testing
 	char* letters = "Enter a string: \0";
@@ -30,7 +31,7 @@ void main()
 	char buffer[512];
 	readSector(buffer, 30);
 	printString(buffer);
-	*/
+	// */
 
 	/*
 	char buffer[13312];   //this is the maximum size of a file
@@ -41,7 +42,7 @@ void main()
 		interrupt(0x21, 0, buffer, 0, 0);   //print out the file 
 	else
 		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  //no sectors read? then print an error
-	*/
+	// */
 
 	while(1);	// PLEASE DON'T CHANGE THIS LINE
 }
@@ -105,13 +106,13 @@ char* readString(char* inputArray)
 	return inputArray;
 }
 
-char* readSector(char* buffer, int sector)
+void readSector(char* address, int sector)
 {
 	int AH = 2;	// this number tells BIOS to read a sector as opposed to write
 	int AL = 1;	// numbers of sectors to read
 	int AX = AH * 256 + AL;
 
-	char* BX = buffer; // address where the data should be stored to
+	char* BX = address; // address where the data should be stored to
 
 	int CH = 0;	// track number
 	int CL = sector + 1; // relative sector number
@@ -123,7 +124,7 @@ char* readSector(char* buffer, int sector)
 	// interrupt(0x13, AX, BX, CX, DX);
 	interrupt(0x13, AX, BX, CX, DX);  
 
-	return buffer;
+	// return address; // I don't think this needs to return anything at all
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -141,28 +142,29 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 	}
 }
 
-void readFile(char* filename) {
+void readFile(char* filename)
+{	
+	int file_entry;
+	char* file_storage_buffer[512];
+	int* directory_buffer[512];
+	int* sectors_read;
 
-	char* buffer[512];
-	//char* buffer2[512];
-	int* i;
 	int AX = 3;
-
 	int BX =  &filename;
-	int CX = &buffer;
-	int DX = &i;
+	int CX = &file_storage_buffer;
+	int DX = &sectors_read;
 	
-	readSector(*buffer, BX);
+	readSector(*directory_buffer, 2);
+
+	directory_buffer[fileentry + i];
 
 	// dir, as shown in the project notes, is not a command
 	// dir, its symbolic for the directory you're currently in
-	for (int fileentry = 0; fileentry < 512; fileentry += 32){
-		if (filename[0] == dir[fileentry+0] && filename[1] == dir[fileentry+1] 
-				&& filename[2] == dir[fileentry+2] && filename[3] == dir[fileentry+3] 
-				&& filename[4] == dir[fileentry+4] && filename[5] == dir[fileentry+5]) {
-
+	for (file_entry = 0; file_entry < 512; file_entry += 32){
+		if(string_matcher(directory_buffer, current_file, filename)){
+		}
 			for (int i = 0; dir[fileentry+i] != 0; i++) {
-				readSector(buffer, dir[fileentry+i]);
+				readSector(file_storage_buffer, dir[fileentry+i]);
                 		CX += 512;
            		} 
        		} 
@@ -170,3 +172,17 @@ void readFile(char* filename) {
 	
 }
 
+int string_matcher(int* directory_buffer, int current_string, char* string_to_beat)
+{
+	int hope = 0;
+	for(int i = 0; i < 6; ++i) {
+		if(directory_buffer[current_string + i] == string_to_beat[i]){
+			if(hope == 6)
+				return 1;
+			hope++;
+		}
+		else
+			return 0;
+	}
+
+}
