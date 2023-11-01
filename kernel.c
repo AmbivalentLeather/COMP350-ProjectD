@@ -8,7 +8,7 @@ char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 
-void readFile(char* filename, char* output_buffer, int* sectorsRead);
+void readFile(char* filename, char output_buffer, int* sectorsRead);
 int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat);
 
 
@@ -145,7 +145,7 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 	}
 }
 
-void readFile(char* filename, char* output_buffer, int* sectorsRead)
+void readFile(char* filename, char output_buffer, int* sectorsRead)
 {	
 	char directory_buffer[512];
 	int i = 0;
