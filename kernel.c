@@ -9,7 +9,7 @@ void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
-int string_compare(char* directory_buffer, int* file_entry, char* string_to_beat);
+int stringCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
 
 
 void main()
@@ -127,16 +127,14 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {	
 	char directory_buffer[512];
 	int i = 0;
-
-	// I only declare the pointer like this so the logic is more clear
-	int file_entry = 0;
 	int* pfile_entry;
-	pfile_entry = &file_entry;
 
+	// Reads directory (sector 2) into directory buffer
 	readSector(directory_buffer, 2);
 
-	// /*
-	if(string_compare(directory_buffer, pfile_entry, filename) == 1){
+	// Checks if filename exists in directory
+	if(stringCompare(directory_buffer, pfile_entry, filename)){
+		// Reads the sectors with filename file into given output_buffer
 		while(directory_buffer[*pfile_entry + i] != 0) {
 			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
 			output_buffer += 512;
@@ -145,32 +143,30 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 		}
        	} else
 		*sectorsRead = 0;
-	// */
 }
 
-int string_compare(char* directory_buffer, int* file_entry, char* string_to_beat)
+int stringCompare(char* directory_buffer, int* file_entry, char* filename_to_beat)
 {
-	// /*
-	int hope = 0;
+	int correct_letters = 0;
 	int i = 0;
 
+	// Check every line in directory_buffer, incrementing 32 to move to the next line
 	for (*file_entry = 0; *file_entry < 512; *file_entry += 32){
-
+		// Compare the first 6 characters to the given filename_to_beat
 		while(i < 6){
-			if(directory_buffer[*file_entry + i] != string_to_beat[i])
+			if(directory_buffer[*file_entry + i] != filename_to_beat[i])
 				break;
 			else 
-				++hope;
+				++correct_letters;
 			++i;
 		}
-
-		if(hope == 6)	// Return true if all characters match
+		// Return true if all characters match, this works regardless of string length
+		if(correct_letters = 6)
 			return 1;
 		else
 			;	// Pass this loop
 	}
-	return 0; // Base case, if the loop above finds nothing, return false
-	// */
-
+	// Base case, if the loop above finds nothing, return false
+	return 0;
 }
 
