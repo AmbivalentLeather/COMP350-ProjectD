@@ -7,7 +7,7 @@ char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
-int string_matcher(char* directory_buffer, int current_string, char* string_to_beat);
+int string_matcher(char* directory_buffer, int file_entry, char* string_to_beat);
 
 
 
@@ -39,9 +39,7 @@ void main()
 	char buffer[13312];   //this is the maximum size of a file
 	int sectorsRead;
 	makeInterrupt21(); 
-	printString("A");
 	interrupt(0x21, 3, "messag", buffer, &sectorsRead);   //read the file into buffer 
-	printString("B");
 	if (sectorsRead>0)
 		interrupt(0x21, 0, buffer, 0, 0);   //print out the file 
 	else
@@ -125,10 +123,7 @@ void readSector(char* address, int sector)
 	int DH = 0;	// head number
 	int DX = DH * 256 + 0x80;
 
-	// interrupt(0x13, AX, BX, CX, DX);
 	interrupt(0x13, AX, BX, CX, DX);  
-
-	// return address; // I don't think this needs to return anything at all
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -144,61 +139,63 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 		case 3: readFile(bx, cx, dx);
 			break;
 		default: printString("Error AX is invalid");
-			 break;
+			break;
 	}
 }
 
 void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {	
 	int file_entry = 0;
-	// char* file_storage_buffer[512];
 	char* directory_buffer[512];
-	// int* sectors_read;
-	int str_match_val;
-
-	/*	It turns out these lines are unimportant
-	int AX = 3;
-	int BX =  &filename;
-	int CX = &file_storage_buffer;
-	int DX = &sectors_read;
-	// */
+	int i = 0;
+	int j = 0;
 	
-	printString("C");
-	readSector(*directory_buffer, 2);
+	readSector(directory_buffer, 2);
 
 	// /*
-	// str_match_val = string_matcher(*directory_buffer, file_entry, filename);
-	if(string_matcher(*directory_buffer, file_entry, filename)){
-		int i;
-		for (i = 0; directory_buffer[file_entry + 6 + i] != 0; i++) {
-			// WHAT FUCKING BUFFER SHOULD I WRITE TO? CX???
-			readSector(output_buffer , directory_buffer[file_entry + 6 + i]);
-                	// output_buffer += 512;
+	if(string_matcher(directory_buffer, file_entry, filename)){
+		printString(" A ");
+		while(directory_buffer[file_entry + 6 + i] > 0) {
+			char* smthn = (char*) file_entry;
+			printString(smthn);
+			++i;
+		}
+		i = 0;
+		while(directory_buffer[file_entry + 6 + i] != 0x0) {
+			printString(" B ");
+			readSector(output_buffer, directory_buffer[file_entry + 6 + i]);
+			printString(" C ");
+			j += 512;
 			++sectorsRead;
-          	} 
+			++i;
+		}
        	} 
+
+	else
+		sectorsRead = 0;
 	// */
 	
 }
 
 int string_matcher(char* directory_buffer, int file_entry, char* string_to_beat)
-{
+{	/* Assumptions: The file name will only be 6 characters */
 	// /*
 	int hope = 0;
-	printString("D");
+	int i;
+
 	for (file_entry = 0; file_entry < 512; file_entry += 32){
-		int i;
-		for(i = 0; i < 5; ++i) {
+		for(i = 0; i < 6; ++i) {
 			if(directory_buffer[file_entry + i] != string_to_beat[i])
 				break;
-			else
+			else 
 				++hope;
 		}
-		if(hope == 6)
+		if(hope == 6)	// Return true if all characters match
 			return 1;
 		else
-			;
+			;	// Pass this loop
 	}
+	return 0; // Base case, if the loop above finds nothing, return false
 	// */
 
 }
