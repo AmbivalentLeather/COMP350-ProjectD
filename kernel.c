@@ -157,11 +157,13 @@ void readFile(char* filename, char output_buffer, int* sectorsRead)
 
 	// /*
 	if(string_matcher(directory_buffer, pfile_entry, filename)){
-//		printString("String matched\r\n");
+		printString("String matched\r\n");
 		while(directory_buffer[*pfile_entry + i] != 0) {
-//			printString("About to readSector\r\n");
+			printString("About to readSector\r\n");
+
 			readSector(&output_buffer, directory_buffer[*pfile_entry + 6 + i]);
-//			printString("readSector to output buffer done\r\n");
+
+			printString("readSector to output buffer done\r\n");
 			++*sectorsRead;
 			++i;
 		}
