@@ -147,28 +147,24 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 
 void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {	
-	int file_entry = 0;
-	char* directory_buffer[512];
+	char directory_buffer[512];
 	int i = 0;
-	int j = 0;
-	
+	// I only declare the pointer like this so the logic is more clear
+	int file_entry = 0;
+	int* pfile_entry;
+	pfile_entry = &file_entry;
+
 	readSector(directory_buffer, 2);
 
 	// /*
-	if(string_matcher(directory_buffer, file_entry, filename)){
-		printString(" A ");
-		while(directory_buffer[file_entry + 6 + i] > 0) {
-			char* smthn = (char*) file_entry;
-			printString(smthn);
-			++i;
-		}
+	if(string_matcher(directory_buffer, pfile_entry, filename)){
+		printString("String matched\r\n");
 		i = 0;
-		while(directory_buffer[file_entry + 6 + i] != 0x0) {
-			printString(" B ");
-			readSector(output_buffer, directory_buffer[file_entry + 6 + i]);
-			printString(" C ");
-			j += 512;
-			++sectorsRead;
+		while(directory_buffer[*pfile_entry + i] != 0) {
+			printString("About to readSector\r\n");
+			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
+			printString("readSector to output buffer done\r\n");
+			++*sectorsRead;
 			++i;
 		}
        	} 
@@ -180,7 +176,7 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 }
 
 int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat)
-{	/* Assumptions: The file name will only be 6 characters */
+{
 	// /*
 	int hope = 0;
 	int i;
