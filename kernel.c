@@ -1,13 +1,15 @@
 /* Written by: Nick Young, Chase Simao, starting code from Joe Matta
  * Date: October 2023 */
 
+/* Function initialization */
 void printString(char*);
 void printChar(char*);
 char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
+
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
-int string_matcher(char* directory_buffer, int file_entry, char* string_to_beat);
+int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat);
 
 
 
@@ -177,15 +179,15 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 	
 }
 
-int string_matcher(char* directory_buffer, int file_entry, char* string_to_beat)
+int string_matcher(char* directory_buffer, int* file_entry, char* string_to_beat)
 {	/* Assumptions: The file name will only be 6 characters */
 	// /*
 	int hope = 0;
 	int i;
 
-	for (file_entry = 0; file_entry < 512; file_entry += 32){
+	for (*file_entry = 0; *file_entry < 512; *file_entry += 32){
 		for(i = 0; i < 6; ++i) {
-			if(directory_buffer[file_entry + i] != string_to_beat[i])
+			if(directory_buffer[*file_entry + i] != string_to_beat[i])
 				break;
 			else 
 				++hope;
