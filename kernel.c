@@ -15,16 +15,19 @@ void executeProgram(char* name);
 void main()
 {
 	// /*
-	char buffer[13312];   //this is the maximum size of a file
-	int sectorsRead;
+//	char buffer[13312];   //this is the maximum size of a file
+//	int sectorsRead;
 
-	makeInterrupt21(); 
-	interrupt(0x21, 3, "messag", buffer, &sectorsRead);   //read the file into buffer 
-	if (sectorsRead>0)
-		interrupt(0x21, 0, buffer, 0, 0);   //print out the file 
-	else
-		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  //no sectors read? then print an error
+//	makeInterrupt21(); 
+//	interrupt(0x21, 3, "messag", buffer, &sectorsRead);   //read the file into buffer 
+//	if (sectorsRead>0)
+//		interrupt(0x21, 0, buffer, 0, 0);   //print out the file 
+//	else
+//		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  //no sectors read? then print an error
 	// */
+
+    makeInterrupt21();
+    interrupt(0x21, 4, "tstpr1", 0, 0);
 
 	while(1);	// PLEASE DON'T CHANGE THIS LINE
 }
@@ -118,6 +121,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 3: readFile(bx, cx, dx);
 			break;
+        case 4: executeProgram(bx);
+            break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -172,12 +177,19 @@ int stringCompare(char* directory_buffer, int* file_entry, char* filename_to_bea
 
 
 void executeProgram(char* name) {
+    int j = 0;
     char* buffer[13312];
     int* sectorsread;
     readFile(name, buffer, sectorsread);
 
-  
+    for (j = 0; j < *sectorsread*512; j++) { // sectorsread is a pointer and multiplying a pointer by 512 could be an issue
+        //putInMemory(int segment, int address, char character)
+         putInMemory(0x2000, &buffer, buffer[j]); // 0x2000 and buffer[j] are correct, unsure about &buffer as the address
+    }
+    
+    launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 
+    
     
 }
 
