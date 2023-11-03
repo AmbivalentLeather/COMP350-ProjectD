@@ -10,7 +10,7 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx);
 
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int stringCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
-
+void executeProgram(char* name);
 
 void main()
 {
@@ -169,4 +169,26 @@ int stringCompare(char* directory_buffer, int* file_entry, char* filename_to_bea
 	// Base case, if the loop above finds nothing, return false
 	return 0;
 }
+
+
+void executeProgram(char* name) {
+    char* buffer[13312];
+    int* sectorsread;
+    readFile(name, buffer, sectorsread);
+
+  
+
+    
+}
+
+
+
+
+
+
+
+
+
+
+
 
