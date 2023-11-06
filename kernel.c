@@ -1,25 +1,26 @@
 /* Written by: Nick Young, Chase Simao, starting code from Joe Matta
  * Date: October 2023 */
 
-/* Function initialization */
+/* Step 1 */
 void printString(char*);
 void printChar(char*);
 char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
+/* Step 2 */
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int stringCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
-
+/* Step 3 */
 void executeProgram(char* name);
 
 void main()
 {
-	/*
+//	/*
 	makeInterrupt21();
 	interrupt(0x21, 4, "tstpr1", 0, 0);
 	// */
 
-// 	/*	Step 1 test code
+ 	/*	Step 1 test code
 	char buffer[13312];   //this is the maximum size of a file
 	int sectorsRead;
 
@@ -134,13 +135,16 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {	
 	char directory_buffer[512];
 	int i = 0;
+
+	int file_entry = 0;
 	int* pfile_entry;
+	pfile_entry = &file_entry;
 
 	// Reads directory (sector 2) into directory buffer
 	readSector(directory_buffer, 2);
 
 	// Checks if filename exists in directory
-	if(stringCompare(directory_buffer, pfile_entry, filename)){
+	if(stringCompare(directory_buffer, pfile_entry, filename) == 1){
 		// Reads the sectors with filename file into given output_buffer
 		while(directory_buffer[*pfile_entry + i] != 0) {
 			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
@@ -168,7 +172,7 @@ int stringCompare(char* directory_buffer, int* file_entry, char* filename_to_bea
 			++i;
 		}
 		// Return true if all characters match, this works regardless of string length
-		if(correct_letters = 6)
+		if(correct_letters == 6)
 			return 1;
 		else
 			;	// Pass this loop
