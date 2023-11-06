@@ -1,23 +1,24 @@
 /* Written by: Nick Young, Chase Simao, starting code from Joe Matta
  * Date: October 2023 */
 
-/* Step 1 */
 void printString(char*);
 void printChar(char*);
 char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
-/* Step 2 */
+/* Step 1 */
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int stringCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
-/* Step 3 */
+/* Step 2 */
 void executeProgram(char* name);
+/* Step 3 */
+void terminate();
 
 void main()
 {
 //	/*
 	makeInterrupt21();
-	interrupt(0x21, 4, "tstpr1", 0, 0);
+	interrupt(0x21, 4, "tstpr2", 0, 0);
 	// */
 
  	/*	Step 1 test code
@@ -126,6 +127,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
         	case 4: executeProgram(bx);
             		break;
+		case 5: terminate();
+			break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -199,3 +202,7 @@ void executeProgram(char* program_name)
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 }
 
+void terminate()
+{
+	while(1);
+}
