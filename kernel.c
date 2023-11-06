@@ -7,9 +7,9 @@ void printChar(char*);
 char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
-
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int stringCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
+
 void executeProgram(char* name);
 
 void main()
@@ -178,16 +178,18 @@ int stringCompare(char* directory_buffer, int* file_entry, char* filename_to_bea
 
 void executeProgram(char* program_name)
 {
-	int j = 0;
     	char buffer[13312];
     	int sectorsRead;
+	int offset = 0;
+	int j = 0;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
-    	for (j = 0; j < sectorsRead * 512; j++) { // sectorsread is a pointer and multiplying a pointer by 512 could be an issue
-        	//putInMemory(int segment, int address, char character)
-         	putInMemory(0x2000, &buffer, buffer[j]); // 0x2000 and buffer[j] are correct, unsure about &buffer as the address
+    	for (j = 0; j < sectorsRead * 512; j++) { 
+        	// putInMemory(int segment, int address, char character)
+         	putInMemory(0x2000, offset + j, buffer[j]); 
+		// 0x2000 and buffer[j] are correct, unsure about &buffer as the address
     	}
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
