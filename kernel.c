@@ -14,10 +14,12 @@ void executeProgram(char* name);
 
 void main()
 {
+	/*
 	makeInterrupt21();
 	interrupt(0x21, 4, "tstpr1", 0, 0);
+	// */
 
-	/*	Step 1 test code
+// 	/*	Step 1 test code
 	char buffer[13312];   //this is the maximum size of a file
 	int sectorsRead;
 
@@ -180,7 +182,6 @@ void executeProgram(char* program_name)
 {
     	char buffer[13312];
     	int sectorsRead;
-	int offset = 0;
 	int j = 0;
 
 	// Read program_name into buffer
@@ -188,8 +189,7 @@ void executeProgram(char* program_name)
 
     	for (j = 0; j < sectorsRead * 512; j++) { 
         	// putInMemory(int segment, int address, char character)
-         	putInMemory(0x2000, offset + j, buffer[j]); 
-		// 0x2000 and buffer[j] are correct, unsure about &buffer as the address
+         	putInMemory(0x2000, j, buffer[j]); 
     	}
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
