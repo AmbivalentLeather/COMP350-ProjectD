@@ -18,7 +18,7 @@ void main()
 {
 //	/*
 	makeInterrupt21();
-	interrupt(0x21, 4, "tstpr2", 0, 0);
+	interrupt(0x21, 4, "shell", 0, 0);
 	// */
 
  	/*	Step 1 test code
@@ -32,8 +32,6 @@ void main()
 	else
 		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  //no sectors read? then print an error
 	// */
-
-	while(1);	// PLEASE DON'T CHANGE THIS LINE
 }
 
 void printString(char* chars)

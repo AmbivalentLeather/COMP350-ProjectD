@@ -19,3 +19,9 @@ bcc -ansi -c -o tstpr2.o tstpr2.c
 as86 -o userlib.o userlib.asm
 ld86 -d -o tstpr2 tstpr2.o userlib.o
 ./loadFile tstpr2
+
+bcc -ansi -c -o shell_c.o shell.c
+as86 userlib.asm -o userlib_asm.o
+ld86 -o shell -d shell_c.o userlib_asm.o
+./loadFile shell
+
