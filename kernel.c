@@ -6,12 +6,9 @@ void printChar(char*);
 char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
-/* Step 1 */
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int stringCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
-/* Step 2 */
 void executeProgram(char* name);
-/* Step 3 */
 void terminate();
 
 void main()
