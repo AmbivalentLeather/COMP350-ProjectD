@@ -17,18 +17,27 @@ void main()
 	makeInterrupt21();
 	interrupt(0x21, 4, "shell", 0, 0);
 	// */
+}
 
- 	/*	Step 1 test code
-	char buffer[13312];   //this is the maximum size of a file
-	int sectorsRead;
-
-	makeInterrupt21(); 
-	interrupt(0x21, 3, "messag", buffer, &sectorsRead);   //read the file into buffer 
-	if (sectorsRead>0)
-		interrupt(0x21, 0, buffer, 0, 0);   //print out the file 
-	else
-		interrupt(0x21, 0, "messag not found\r\n", 0, 0);  //no sectors read? then print an error
-	// */
+void handleInterrupt21(int ax, char* bx, int cx, int dx)
+{
+	switch(ax)
+	{
+		case 0: printString(bx);
+			break;
+		case 1: readString(bx);
+			break;
+		case 2: readSector(bx, cx);
+			break;
+		case 3: readFile(bx, cx, dx);
+			break;
+        	case 4: executeProgram(bx);
+            		break;
+		case 5: terminate();
+			break;
+		default: printString("Error AX is invalid");
+			break;
+	}
 }
 
 void printString(char* chars)
@@ -108,26 +117,6 @@ void readSector(char* address, int sector)
 	interrupt(0x13, AX, BX, CX, DX);  
 }
 
-void handleInterrupt21(int ax, char* bx, int cx, int dx)
-{
-	switch(ax)
-	{
-		case 0: printString(bx);
-			break;
-		case 1: readString(bx);
-			break;
-		case 2: readSector(bx, cx);
-			break;
-		case 3: readFile(bx, cx, dx);
-			break;
-        	case 4: executeProgram(bx);
-            		break;
-		case 5: terminate();
-			break;
-		default: printString("Error AX is invalid");
-			break;
-	}
-}
 
 void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {	
