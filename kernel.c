@@ -90,8 +90,8 @@ char* readString(char* inputArray)
 		interrupt(0x10, 0xe * 256 + keyboardInput, 0, 0, 0);
 		++i;
 	}
-	inputArray[i] = 0xa;
-	inputArray[i + 1] = 0x0;
+	inputArray[i] = 0xd;	// Add return character to character array
+	inputArray[i + 1] = 0x0;	// Add null character to character array
 
 	interrupt(0x10, 0xe * 256 + 0xd, 0, 0, 0); // Print return character
 	interrupt(0x10, 0xe * 256 + 0xa, 0, 0, 0); // Print line feed character
@@ -188,5 +188,13 @@ void executeProgram(char* program_name)
 
 void terminate()
 {
-	while(1);
+	char shellname[6];
+	shellname[0] = 's';
+	shellname[1] = 'h';
+	shellname[2] = 'e';
+	shellname[3] = 'l';
+	shellname[4] = 'l';
+	shellname[5] = '\0';
+
+	executeProgram(shellname);
 }
