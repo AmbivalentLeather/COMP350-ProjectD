@@ -185,6 +185,7 @@ int stringCompare(char* given_file, char* name_to_beat)
 			++correct_letters;
 		++i;
 	}
+	printString("Deez nuts");
 	// Return true if all characters match, this works regardless of string length
 	if(correct_letters == 4)
 		return 1;
