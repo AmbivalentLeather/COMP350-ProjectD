@@ -4,6 +4,7 @@
 void type(char* inputFileName);
 void exec(char* inputFileName);
 void findFileName(char* given_string, char* fileName);
+int stringCompare(char* given, char* compared_to);
 
 int main()
 {
@@ -16,31 +17,27 @@ int main()
 	
 	int i = 0;
 
-	while(1){
-		syscall(0, "C> ");
-		syscall(1, given_string);
+	syscall(0, "C> ");
+	syscall(1, given_string);
 
-		for (i = 0; i < 4; i++) {
-			testString[i] = given_string[i];
-		}
-		
-		// Find, in the line given by the user, the filename to look for
-		// This is a temporary solution to a slightly larger problem
-		findFileName(given_string, fileName);
-
-//		/*
-		if (syscall(6, testString, cmdType) != 0) {	// Should return false when testString == cmdExec
-			type(fileName);
-			syscall(5);
-		}
-		else if (syscall(6, testString, cmdExec) != 0) {
-			exec(fileName);
-			syscall(5);
-		}
-		// */
-		syscall(5);
-		
+	for (i = 0; i < 4; i++) {
+		testString[i] = given_string[i];
 	}
+	
+	// Find, in the line given by the user, the filename to look for
+	// This is a temporary solution to a slightly larger problem
+	findFileName(given_string, fileName);
+
+//	/*
+	if (stringCompare(testString, cmdType)) {	// Should return false when testString == cmdExec
+		type(fileName);
+	}
+	else if (stringCompare(testString, cmdExec)) {
+		exec(fileName);
+	}
+	// */
+	syscall(5);
+		
 }
 
 void type(char* inputFileName)
@@ -54,13 +51,12 @@ void type(char* inputFileName)
 	// /*
 	if (sectorsRead > 0) {
 		syscall(0, buffer);
-		syscall(5);
 	}	
 	else {
 		syscall(0, "File not found.\r\n");
-		syscall(5);
 	}
 	// */
+	syscall(5);
 }
 
 void exec(char* inputFileName)
@@ -77,4 +73,20 @@ void findFileName(char* given_string, char* fileName)
 		fileName[i] = given_string[i + 5];
 		++i;
 	}
+}
+
+int stringCompare(char* given, char* compared_to)
+{
+	syscall(0, "STRING COMPARE WORKS");
+	while (*given && *compared_to) {
+		if (*given != *compared_to) {
+			return 0;
+		}
+		
+		given++;
+		compared_to++;
+
+	}
+
+	return (*given == '\0' && *compared_to == '\0');
 }
