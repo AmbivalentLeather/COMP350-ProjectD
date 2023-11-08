@@ -7,7 +7,7 @@ char* readString(char*);
 void readSector(char*, int);
 void handleInterrupt21(int ax, char* bx, int cx, int dx);
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
-int stringCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
+int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
 void executeProgram(char* name);
 void terminate();
 
@@ -34,6 +34,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
         	case 4: executeProgram(bx);
             		break;
 		case 5: terminate();
+			break;
+		case 6: stringCompare(bx, cx);
 			break;
 		default: printString("Error AX is invalid");
 			break;
@@ -131,7 +133,7 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 	readSector(directory_buffer, 2);
 
 	// Checks if filename exists in directory
-	if(stringCompare(directory_buffer, pfile_entry, filename) == 1){
+	if(directoryLineCompare(directory_buffer, pfile_entry, filename) == 1){
 		// Reads the sectors with filename file into given output_buffer
 		while(directory_buffer[*pfile_entry + i] != 0) {
 			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
@@ -143,7 +145,7 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 		*sectorsRead = 0;
 }
 
-int stringCompare(char* directory_buffer, int* file_entry, char* filename_to_beat)
+int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename_to_beat)
 {
 	int correct_letters = 0;
 	int i = 0;
@@ -164,6 +166,28 @@ int stringCompare(char* directory_buffer, int* file_entry, char* filename_to_bea
 		else
 			;	// Pass this loop
 	}
+	// Base case, if the loop above finds nothing, return false
+	return 0;
+}
+
+
+int stringCompare(char* given_file, char* name_to_beat)
+{
+	int correct_letters = 0;
+	int i = 0;
+
+	// Check every line in directory_buffer, incrementing 32 to move to the next line
+	// Compare the first 6 characters to the given filename_to_beat
+	while(i < 4){
+		if(given_file[i] != name_to_beat[i])
+			break;
+		else 
+			++correct_letters;
+		++i;
+	}
+	// Return true if all characters match, this works regardless of string length
+	if(correct_letters == 4)
+		return 1;
 	// Base case, if the loop above finds nothing, return false
 	return 0;
 }
