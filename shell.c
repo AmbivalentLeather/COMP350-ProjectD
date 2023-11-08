@@ -9,7 +9,7 @@ int main()
 {
 	char* given_string;
 	char testString[4];
-	char* fileName;
+	char* fileName = "None";
 
 	char* cmdType = "type";
 	char* cmdExec = "exec";
@@ -20,23 +20,26 @@ int main()
 		syscall(0, "C> ");
 		syscall(1, given_string);
 
-		for (i = 0; i < 4; i++)
+		for (i = 0; i < 4; i++) {
 			testString[i] = given_string[i];
+		}
 		
 		// Find, in the line given by the user, the filename to look for
 		// This is a temporary solution to a slightly larger problem
 		findFileName(given_string, fileName);
 
-		/*
-		if (syscall(6, testString, cmdType))	// Should return false when testString == cmdExec
+//		/*
+		if (syscall(6, testString, cmdType) != 0) {	// Should return false when testString == cmdExec
 			type(fileName);
-		else if (syscall(6, testString, cmdExec))
+			syscall(5);
+		}
+		else if (syscall(6, testString, cmdExec) != 0) {
 			exec(fileName);
+			syscall(5);
+		}
 		// */
-		
-		exec(fileName);
-
 		syscall(5);
+		
 	}
 }
 
@@ -49,10 +52,14 @@ void type(char* inputFileName)
 	syscall(0, "AAAAAAAAA");
 
 	// /*
-	if (sectorsRead > 0)
+	if (sectorsRead > 0) {
 		syscall(0, buffer);
-	else
+		syscall(5);
+	}	
+	else {
 		syscall(0, "File not found.\r\n");
+		syscall(5);
+	}
 	// */
 }
 
@@ -60,6 +67,7 @@ void exec(char* inputFileName)
 {
 	syscall(0, "BBBBBBBBB");
 	syscall(4, inputFileName);
+	syscall(5);
 }
 
 void findFileName(char* given_string, char* fileName)

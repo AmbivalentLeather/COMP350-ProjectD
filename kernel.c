@@ -185,6 +185,7 @@ int stringCompare(char* given_file, char* name_to_beat)
 			++correct_letters;
 		++i;
 	}
+	printString("Deez nuts");
 	// Return true if all characters match, this works regardless of string length
 	if(correct_letters == 4)
 		return 1;
@@ -197,14 +198,14 @@ void executeProgram(char* program_name)
 {
     	char buffer[13312];
     	int sectorsRead;
-	int j = 0;
+	int offset = 0;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
-    	for (j = 0; j < sectorsRead * 512; j++) { 
+    	for (offset = 0; offset < sectorsRead * 512; offset++) { 
         	// putInMemory(int segment, int address, char character)
-         	putInMemory(0x2000, j, buffer[j]); 
+         	putInMemory(0x2000, offset, buffer[offset]); 
     	}
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
