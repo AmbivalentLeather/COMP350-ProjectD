@@ -2,15 +2,18 @@
  * Step 4 of Project C
  */
 void type(char* inputFileName);
+void exec(char* inputFileName);
 void findFileName(char* given_string, char* fileName);
 
 int main()
 {
 	char* given_string;
 	char testString[4];
-	char* cmdType = "type";
 	char* fileName;
 
+	char* cmdType = "type";
+	char* cmdExec = "exec";
+	
 	int i = 0;
 
 	while(1){
@@ -24,9 +27,14 @@ int main()
 		// This is a temporary solution to a slightly larger problem
 		findFileName(given_string, fileName);
 
-		if (syscall(6, testString, cmdType)){
+		/*
+		if (syscall(6, testString, cmdType))	// Should return false when testString == cmdExec
 			type(fileName);
-		}
+		else if (syscall(6, testString, cmdExec))
+			exec(fileName);
+		// */
+		
+		exec(fileName);
 
 		syscall(5);
 	}
@@ -38,12 +46,20 @@ void type(char* inputFileName)
 	int sectorsRead;
 	syscall(3, inputFileName, buffer, &sectorsRead);
 
+	syscall(0, "AAAAAAAAA");
+
 	// /*
 	if (sectorsRead > 0)
 		syscall(0, buffer);
 	else
 		syscall(0, "File not found.\r\n");
 	// */
+}
+
+void exec(char* inputFileName)
+{
+	syscall(0, "BBBBBBBBB");
+	syscall(4, inputFileName);
 }
 
 void findFileName(char* given_string, char* fileName)
