@@ -6,6 +6,7 @@ void exec(char* inputFileName);
 void findFileName(char* given_string, char* fileName);
 int stringCompareType(char* given, char* compared_to);
 int stringCompareExec(char* given, char* compared_to);
+void cSpacing(char* file_name);
 
 int main()
 {
@@ -59,14 +60,17 @@ void type(char* inputFileName)
 		syscall(0, "File not found.\r\n");
 	}
 	// */
+    syscall(0, "\n\r");
 	syscall(5);
 }
 
 void exec(char* inputFileName)
 {
 	syscall(0, "BBBBBBBBB");
+    syscall(0, "\n\r");
 	syscall(4, inputFileName);
 	syscall(5);
+ 
 }
 
 void findFileName(char* given_string, char* fileName)
@@ -93,4 +97,11 @@ int stringCompare(char* given, char* compared_to)
 
 	return (*given == '\0' && *compared_to == '\0');
 }
+
+
+
+
+
+
+
 
