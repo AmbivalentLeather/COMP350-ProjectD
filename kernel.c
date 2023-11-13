@@ -197,6 +197,8 @@ void executeProgram(char* program_name)
     	int sectorsRead;
 	int offset = 0;
 
+	printString("Execute program runs\n\r");
+
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
@@ -204,7 +206,7 @@ void executeProgram(char* program_name)
         	// putInMemory(int segment, int address, char character)
          	putInMemory(0x2000, offset, buffer[offset]); 
     	}
-	printString("Execute program runs ");
+	printString("Execute program completes\n\r");
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 }
