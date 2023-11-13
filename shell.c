@@ -34,8 +34,8 @@ int main()
 	if (stringCompare(testString, cmdType)) {	// Should return false when testString == cmdExec
 		type(fileName);
 	} else {
-        exec(fileName);
-    }
+        	exec(fileName);
+    	}
 //	if (stringCompareExec(testString, cmdExec)) {
 //		exec(fileName);
 //	}
@@ -60,14 +60,14 @@ void type(char* inputFileName)
 		syscall(0, "File not found.\r\n");
 	}
 	// */
-    syscall(0, "\n\r");
+	syscall(0, "\n\r");
 	syscall(5);
 }
 
 void exec(char* inputFileName)
 {
 	syscall(0, "BBBBBBBBB");
-    syscall(0, "\n\r");
+	syscall(0, "\n\r");
 	syscall(4, inputFileName);
 	syscall(5);
  

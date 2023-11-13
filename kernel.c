@@ -204,9 +204,11 @@ void executeProgram(char* program_name)
     	readFile(program_name, buffer, &sectorsRead);
 
     	for (offset = 0; offset < sectorsRead * 512; offset++) { 
+//		printString("Inside loop");
         	// putInMemory(int segment, int address, char character)
          	putInMemory(0x2000, offset, buffer[offset]); 
     	}
+	printString("Outside loop");
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 }
