@@ -3,42 +3,43 @@
  */
 void type(char* inputFileName);
 void exec(char* inputFileName);
-void findFileName(char* given_string, char* fileName);
+void findFileName(char* userInput, char* fileName);
 void findCommandName(char* inputString, char* outputString);
 int stringCompare(char* given, char* compared_to);
 
 int main()
 {
-	char* userInput;
-	char cmdString[4];
-	char* fileName;
-
-	char* cmdType = "type";
-	char* cmdExec = "exec";
+	while(1) {
+		char userInput[80];
+		char cmdString[4];
+		char fileName[12];
 	
-	syscall(0, "C> ");
-	syscall(1, userInput);
-
-	findCommandName(userInput, cmdString);
+		char* cmdType = "type";
+		char* cmdExec = "exec";
+		
+		syscall(0, "C> ");
+		syscall(1, userInput);
 	
-	// Find, in the line given by the user, the filename to look for
-	// This is a temporary solution to a slightly larger problem
-	findFileName(userInput, fileName);
+		findCommandName(userInput, cmdString);
+		
+		// Find, in the line given by the user, the filename to look for
+		// This is a temporary solution to a slightly larger problem
+		findFileName(userInput, fileName);
 
-//	/*
+//		/*
 
-	if (stringCompare(cmdString, cmdType)) {
-		syscall(0, "Conditional runs type()\n\r");
-		type(fileName);
+		if (stringCompare(cmdString, cmdType)) {
+			syscall(0, "Conditional runs type()\n\r");
+			type(fileName);
+		} else if (stringCompare(cmdString, cmdExec)) {
+			syscall(0, "Conditional runs exec()\n\r");
+			exec(fileName);
+		} else {
+			syscall(0, "Bad command!\n\r");
+		}
+
+		// */
 	}
-	if (stringCompare(cmdString, cmdExec)) {
-		syscall(0, "Conditional runs exec()\n\r");
-		exec(fileName);
-	}
-
-	// */
-
-	syscall(5);
 		
 }
 
@@ -59,7 +60,7 @@ void type(char* inputFileName)
 		syscall(0, "File not found.\r\n");
 	}
 	// */
-	syscall(0, "Type completed\n\r");
+	syscall(0, "Type completes\n\r");
 	syscall(5);
 }
 
@@ -81,7 +82,7 @@ void exec(char* inputFileName)
 		syscall(0, "File not found.\r\n");
 	}
 	// */
-	syscall(0, "Exec completed\n\r");
+	syscall(0, "Exec completes\n\r");
 	syscall(5);
 }
 
