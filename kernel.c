@@ -11,7 +11,7 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_t
 void executeProgram(char* name);
 void terminate();
 
-void main()
+int main()
 {
 //	/*
 	makeInterrupt21();
@@ -34,8 +34,6 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
         	case 4: executeProgram(bx);
             		break;
 		case 5: terminate();
-			break;
-		case 6: stringCompare(bx, cx);
 			break;
 		default: printString("Error AX is invalid");
 			break;
@@ -185,7 +183,6 @@ int stringCompare(char* given_file, char* name_to_beat)
 			++correct_letters;
 		++i;
 	}
-	printString("Deez nuts");
 	// Return true if all characters match, this works regardless of string length
 	if(correct_letters == 4)
 		return 1;
@@ -204,11 +201,10 @@ void executeProgram(char* program_name)
     	readFile(program_name, buffer, &sectorsRead);
 
     	for (offset = 0; offset < sectorsRead * 512; offset++) { 
-//		printString("Inside loop");
         	// putInMemory(int segment, int address, char character)
          	putInMemory(0x2000, offset, buffer[offset]); 
     	}
-	printString("Outside loop");
+	printString("Execute program runs ");
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 }
