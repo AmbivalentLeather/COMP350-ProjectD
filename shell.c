@@ -4,7 +4,9 @@
 void type(char* inputFileName);
 void exec(char* inputFileName);
 void findFileName(char* given_string, char* fileName);
-int stringCompare(char* given, char* compared_to);
+int stringCompareType(char* given, char* compared_to);
+int stringCompareExec(char* given, char* compared_to);
+void cSpacing(char* file_name);
 
 int main()
 {
@@ -31,10 +33,12 @@ int main()
 //	/*
 	if (stringCompare(testString, cmdType)) {	// Should return false when testString == cmdExec
 		type(fileName);
-	}
-	else if (stringCompare(testString, cmdExec)) {
-		exec(fileName);
-	}
+	} else {
+        exec(fileName);
+    }
+//	if (stringCompareExec(testString, cmdExec)) {
+//		exec(fileName);
+//	}
 	// */
 	syscall(5);
 		
@@ -56,14 +60,17 @@ void type(char* inputFileName)
 		syscall(0, "File not found.\r\n");
 	}
 	// */
+    syscall(0, "\n\r");
 	syscall(5);
 }
 
 void exec(char* inputFileName)
 {
 	syscall(0, "BBBBBBBBB");
+    syscall(0, "\n\r");
 	syscall(4, inputFileName);
 	syscall(5);
+ 
 }
 
 void findFileName(char* given_string, char* fileName)
@@ -77,7 +84,7 @@ void findFileName(char* given_string, char* fileName)
 
 int stringCompare(char* given, char* compared_to)
 {
-	syscall(0, "STRING COMPARE WORKS");
+    syscall(0, "STRING COMPARE WORKS");
 	while (*given && *compared_to) {
 		if (*given != *compared_to) {
 			return 0;
@@ -90,3 +97,11 @@ int stringCompare(char* given, char* compared_to)
 
 	return (*given == '\0' && *compared_to == '\0');
 }
+
+
+
+
+
+
+
+
