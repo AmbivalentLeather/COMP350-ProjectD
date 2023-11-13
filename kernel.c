@@ -13,10 +13,8 @@ void terminate();
 
 int main()
 {
-//	/*
 	makeInterrupt21();
 	interrupt(0x21, 4, "shell", 0, 0);
-	// */
 }
 
 void handleInterrupt21(int ax, char* bx, int cx, int dx)
@@ -52,6 +50,7 @@ void printString(char* chars)
 	}
 }
 
+/*
 void printChar(char* inputChar)
 {
 	char al = inputChar[0];
@@ -59,6 +58,7 @@ void printChar(char* inputChar)
 	int ax = ah * 256 + al;
 	interrupt(0x10, ax, 0, 0, 0);
 }
+// */
 
 char* readString(char* inputArray)
 {
@@ -168,36 +168,13 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename
 	return 0;
 }
 
-
-int stringCompare(char* given_file, char* name_to_beat)
-{
-	int correct_letters = 0;
-	int i = 0;
-
-	// Check every line in directory_buffer, incrementing 32 to move to the next line
-	// Compare the first 6 characters to the given filename_to_beat
-	while(i < 4){
-		if(given_file[i] != name_to_beat[i])
-			break;
-		else 
-			++correct_letters;
-		++i;
-	}
-	// Return true if all characters match, this works regardless of string length
-	if(correct_letters == 4)
-		return 1;
-	// Base case, if the loop above finds nothing, return false
-	return 0;
-}
-
-
 void executeProgram(char* program_name)
 {
     	char buffer[13312];
     	int sectorsRead;
 	int offset = 0;
 
-	printString("Execute program runs\n\r");
+//	printString("Execute program runs\n\r");
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
@@ -206,7 +183,7 @@ void executeProgram(char* program_name)
         	// putInMemory(int segment, int address, char character)
          	putInMemory(0x2000, offset, buffer[offset]); 
     	}
-	printString("Execute program completes\n\r");
+//	printString("Execute program completes\n\r");
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 }
