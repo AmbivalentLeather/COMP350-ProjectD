@@ -27,9 +27,11 @@ int main()
 //		/*
 		if (stringCompare(cmdString, cmdType)) {
 			type(fileName);
-		} else if (stringCompare(cmdString, cmdExec)) {
+		}
+		else if (stringCompare(cmdString, cmdExec)) {
 			exec(fileName);
-		} else {
+		}
+		else {
 			syscall(0, "Bad command!\n\r");
 		}
 		// */
@@ -94,11 +96,9 @@ void findCommandName(char* inputString, char* outputString)
 int stringCompare(char given[], char* compared_to)
 {
 	int i = 0;
-
 	while(given[i] != '\0' && compared_to[i] != '\0') {
-		if (given[i] != compared_to[i]) {
+		if (given[i] != compared_to[i])
 			return 0;
-		}
 		i++;
 	}
 
