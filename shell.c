@@ -3,8 +3,8 @@
  */
 void type(char* inputFileName);
 void exec(char* inputFileName);
-void findFileName(char* userInput, char* fileName);
-void findCommandName(char* inputString, char* outputString);
+void findFileName(char userInput[], char* fileName);
+void findCommandName(char inputString[], char* outputString);
 int stringCompare(char* given, char* compared_to);
 
 int main()
@@ -103,26 +103,21 @@ void findCommandName(char* inputString, char* outputString)
 	}
 }	
 
-int stringCompare(char* given, char* compared_to)
+int stringCompare(char given[], char* compared_to)
 {
-	// THIS WHOLE FUNCTION NEEDS TO BE REWRITTEN
+	int i = 0;
 
 	syscall(0, "stringCompare Runs\n\r");
-	// Loop through each character in given strings
-	while (*given && *compared_to) {
-		// If the characters are not equal, strings are not equal
-		if (*given != *compared_to) {
-		syscall(0, "stringCompare Completes\n\r");
+
+	while(given[i] != '\0' && compared_to[i] != '\0') {
+		if (given[i] != compared_to[i]) {
+			syscall(0, "stringCompare Completes\n\r");
 			return 0;
 		}
-		
-		// Move to the next character in each string
-		given++;
-		compared_to++;
+		i++;
 	}
 
 	syscall(0, "stringCompare Completes\n\r");
-	// Check if both strings have reached an end, return 1 if true
-	return (*given == '\0' && *compared_to == '\0');
+	return 1;
 }
 
