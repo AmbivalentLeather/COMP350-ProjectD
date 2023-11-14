@@ -13,11 +13,8 @@ int main()
 		char userInput[80];
 		char cmdString[4];
 		char fileName[12];
-	
-		char* cmdType = "type";
-		char* cmdExec = "exec";
 		
-		syscall(0, "C> ");
+		syscall(0, "\rC> ");
 		syscall(1, userInput);
 	
 		// Find the command used and the file name being referenced
@@ -25,10 +22,10 @@ int main()
 		findFileName(userInput, fileName);
 
 //		/*
-		if (stringCompare(cmdString, cmdType)) {
+		if (stringCompare(cmdString, "type")) {
 			type(fileName);
 		}
-		else if (stringCompare(cmdString, cmdExec)) {
+		else if (stringCompare(cmdString, "exec")) {
 			exec(fileName);
 		}
 		else {
@@ -85,12 +82,18 @@ void findFileName(char* inputString, char* fileName)
 	}
 }
 
-void findCommandName(char* inputString, char* outputString)
+void findCommandName(char inputString[], char* outputString)
 {
-	int i;
+	int i = 0;
+	while (inputString[i] != ' ') {
+		outputString[i] = inputString[i];
+	}
+
+	/*
 	for (i = 0; i < 4; i++) {
 		outputString[i] = inputString[i];
 	}
+	*/
 }	
 
 int stringCompare(char given[], char* compared_to)
