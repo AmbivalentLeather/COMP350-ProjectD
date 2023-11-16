@@ -9,6 +9,7 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx);
 void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
 void executeProgram(char* name);
+void writeSector(char*, int);
 void terminate();
 
 int main()
@@ -33,6 +34,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
             		break;
 		case 5: terminate();
 			break;
+        case 6: writeSector(bx, cx);
+            break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -182,6 +185,24 @@ void executeProgram(char* program_name)
     	}
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
+}
+
+void writeSector(char* address, int sector)
+{
+	int AH = 3;	// this number tells BIOS to read a sector as opposed to write (changed to 3 for writeSector)
+	int AL = 1;	// numbers of sectors to read
+	int AX = AH * 256 + AL;
+
+	char* BX = address; // address where the data should be stored to
+
+	int CH = 0;	// track number
+	int CL = sector + 1; // relative sector number
+	int CX = CH * 256 + CL;
+
+	int DH = 0;	// head number
+	int DX = DH * 256 + 0x80;
+
+	interrupt(0x13, AX, BX, CX, DX);  
 }
 
 void terminate()

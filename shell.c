@@ -106,3 +106,14 @@ int stringCompare(char given[], char* compared_to)
 	return 1;
 }
 
+
+
+
+
+
+
+
+
+
+
+
