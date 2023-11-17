@@ -8,6 +8,7 @@ int stringCompare(char* given, char* compared_to);
 void argFinder(char*, char*, int);
 void numOfArgs(char*, int*);
 void dir();
+void del(char* address);
 
 int main()
 {
@@ -19,6 +20,7 @@ int main()
 		char* cmdType = "type";
 		char* cmdExec = "exec";
 		char* cmdDir = "dir";
+		char* cmdDel = "del";
 		
 		syscall(0, "\rC> ");
 		syscall(1, userInput);
@@ -38,6 +40,10 @@ int main()
 		else if (stringCompare(cmdString, cmdDir)) {
             		dir();
         	}
+		else if (stringCompare(cmdString, cmdDel)) {
+			argFinder(userInput, fileName, 1);
+			del(fileName);
+		}
 		else {
 			syscall(0, "Bad command!\n\r");
 		}
@@ -106,6 +112,21 @@ void dir()
 		}
 		// file_size = 0;
 	}
+
+}
+
+void del(char* filename)
+{
+	char buffer[13312]; /*this is the maximum size of a file*/
+	int sectorsRead;
+	syscall(3, filename, buffer, &sectorsRead);
+
+	if (sectorsRead > 0) {
+		syscall(7, filename);
+		syscall(0, "File deleted.\n\r");
+	}
+	else
+		syscall(0, "File not found.\r\n");
 
 }
 

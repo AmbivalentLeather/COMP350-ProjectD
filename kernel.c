@@ -10,6 +10,7 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead);
 int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_to_beat);
 void executeProgram(char* name);
 void writeSector(char*, int);
+void deleteFile(char* filename);
 void terminate();
 
 int main()
@@ -35,6 +36,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 		case 5: terminate();
 			break;
 		case 6: writeSector(bx, cx);
+			break;
+		case 7: deleteFile(bx);
 			break;
 		default: printString("Error AX is invalid");
 			break;
@@ -161,6 +164,36 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 		}
        	} else
 		*sectorsRead = 0;
+}
+
+void deleteFile(char* filename)
+{
+	char dir[512];
+	char map[512];
+	int i = 0;
+	int mapIndex = 0;
+
+	int file_entry = 0;
+	int* pfile_entry = &file_entry;
+
+	// Reads map (sector 1) into map buffer
+	readSector(map, 1);
+	// Reads directory (sector 2) into directory buffer
+	readSector(dir, 2);
+
+	// Checks if filename exists in directory
+	if (directoryLineCompare(dir, pfile_entry, filename)) {
+		dir[*pfile_entry] = '\0';
+		while(dir[*pfile_entry + 6 + i] != '\0') {
+			mapIndex = dir[*pfile_entry + 6 + i];
+			map[mapIndex] = 0;
+			i++;
+		}
+       	}
+
+	writeSector(map, 1);
+	writeSector(dir, 2);
+
 }
 
 int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename_to_beat)
