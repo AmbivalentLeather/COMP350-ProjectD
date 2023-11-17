@@ -147,24 +147,22 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 
 int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename_to_beat)
 {
-	int correct_letters = 0;
+	int correctIndex = 0;
 	int i = 0;
 
 	// Check every line in directory_buffer, incrementing 32 to move to the next line
 	for (*file_entry = 0; *file_entry < 512; *file_entry += 32){
 		// Compare the first 6 characters to the given filename_to_beat
-		while(i < 6){
+		while (i < 6) {
 			if(directory_buffer[*file_entry + i] != filename_to_beat[i])
 				break;
 			else 
-				++correct_letters;
+				correctIndex++;
 			++i;
 		}
 		// Return true if all characters match, this works regardless of string length
-		if(correct_letters == 6)
+		if(correctIndex == 6)
 			return 1;
-		else
-			;	// Pass this loop
 	}
 	// Base case, if the loop above finds nothing, return false
 	return 0;
