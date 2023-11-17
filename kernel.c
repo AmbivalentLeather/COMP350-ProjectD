@@ -36,6 +36,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
         case 6: writeSector(bx, cx);
             break;
+        case 7: printChar(bx);
+            break;
 		default: printString("Error AX is invalid");
 			break;
 	}

@@ -121,34 +121,24 @@ void argFinder(char* input, char* output, int whichArg)
 void dir() {
     char directory_buffer[512];
 	int i = 0;
-    //int correct_letters = 0;
 
 	int file_entry = 0;
-	int* pfile_entry;
-	pfile_entry = &file_entry;
-	//*sectorsRead = 0;
 
-	// Reads directory (sector 2) into directory buffer
-    syscall(2, directory_buffer);
-    //syscall(0, directory_buffer[10]);
-    //syscall(0, "Hello World");
+    syscall(2, directory_buffer, 2);
 
    for (file_entry = 0; file_entry < 512; file_entry += 32){
-        syscall(0, directory_buffer[file_entry]);
-        syscall(0, "\n\r");
+        if (directory_buffer[file_entry] != '\0') {
+           while(i < 6){
+                    //syscall(0, directory_buffer[file_entry + i]);
+                    syscall(7, directory_buffer[file_entry + i]);
+                    i++;
+           }
+            
+	   }
+       syscall(0, "\n\r");
+       i = 0;
    }
 
-	// Checks if filename exists in directory
-/*	if(directoryLineCompare(directory_buffer, pfile_entry, filename) == 1){
-		// Reads the sectors with filename file into given output_buffer
-		while(directory_buffer[*pfile_entry + i] != 0) {
-			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
-			output_buffer += 512;
-			++*sectorsRead;
-			++i;
-		}
-       	} else
-		*sectorsRead = 0; */
 }
 
 
