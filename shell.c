@@ -18,7 +18,7 @@ int main()
 
 		char* cmdType = "type";
 		char* cmdExec = "exec";
-        char* cmdDir = "dir";
+		char* cmdDir = "dir";
 		
 		syscall(0, "\rC> ");
 		syscall(1, userInput);
@@ -35,9 +35,9 @@ int main()
 			argFinder(userInput, fileName, 1);
 			exec(fileName);
 		}
-        else if (stringCompare(cmdString, cmdDir)) {
-            dir();
-        }
+		else if (stringCompare(cmdString, cmdDir)) {
+            		dir();
+        	}
 		else {
 			syscall(0, "Bad command!\n\r");
 		}
@@ -69,6 +69,44 @@ void exec(char* inputFileName)
 		syscall(4, inputFileName);
 	else
 		syscall(0, "File not found.\r\n");
+}
+
+void dir()
+{
+	char directory_buffer[512];
+	char file_buffer[10];
+	int i = 0;
+
+	int file_size = 0;
+
+	int file_entry = 0;
+
+	syscall(2, directory_buffer, 2);
+
+	for (file_entry = 0; file_entry < 512; file_entry += 32){
+		if (directory_buffer[file_entry] != '\0') {
+			while(i < 6){
+				file_buffer[i] = directory_buffer[file_entry + i];
+				i++;
+			}
+			/* The problem with this part is that I don't know how to print a number.
+			 * Also, this would only print up the size of all the sectors, not size of file
+			while (directory_buffer[file_entry + i] != '\0') {
+				// file_size += 512;
+				syscall(0, "H");
+				i++;
+			}
+			syscall(0, "\n\r");
+			// */
+			syscall(0, file_buffer);
+			// syscall(0, "\t");
+			// syscall(0, file_size);
+			syscall(0, "\n\r");
+		}
+		i = 0;
+		// file_size = 0;
+	}
+
 }
 
 // I don't like that we're mixing [] and * since in this context they mean the same thing
@@ -117,34 +155,4 @@ void argFinder(char* input, char* output, int whichArg)
 
 	output[outputIndex] = '\0';
 }
-
-void dir() {
-    char directory_buffer[512];
-	int i = 0;
-
-	int file_entry = 0;
-
-    syscall(2, directory_buffer, 2);
-
-   for (file_entry = 0; file_entry < 512; file_entry += 32){
-        if (directory_buffer[file_entry] != '\0') {
-           while(i < 6){
-                    //syscall(0, directory_buffer[file_entry + i]);
-                    syscall(7, directory_buffer[file_entry + i]);
-                    i++;
-           }
-            
-	   }
-       syscall(0, "\n\r");
-       i = 0;
-   }
-
-}
-
-
-
-
-
-
-
 

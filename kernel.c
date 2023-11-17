@@ -34,10 +34,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
             		break;
 		case 5: terminate();
 			break;
-        case 6: writeSector(bx, cx);
-            break;
-        case 7: printChar(bx);
-            break;
+		case 6: writeSector(bx, cx);
+			break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -120,6 +118,24 @@ void readSector(char* address, int sector)
 	interrupt(0x13, AX, BX, CX, DX);  
 }
 
+void writeSector(char* address, int sector)
+{
+	// this number tells BIOS to read a sector as opposed to write (changed to 3 for writeSector)
+	int AH = 3;
+	int AL = 1;	// numbers of sectors to read
+	int AX = AH * 256 + AL;
+
+	char* BX = address; // address where the data should be stored to
+
+	int CH = 0;	// track number
+	int CL = sector + 1; // relative sector number
+	int CX = CH * 256 + CL;
+
+	int DH = 0;	// head number
+	int DX = DH * 256 + 0x80;
+
+	interrupt(0x13, AX, BX, CX, DX);  
+}
 
 void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {
@@ -135,7 +151,7 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 	readSector(directory_buffer, 2);
 
 	// Checks if filename exists in directory
-	if(directoryLineCompare(directory_buffer, pfile_entry, filename) == 1){
+	if (directoryLineCompare(directory_buffer, pfile_entry, filename)) {
 		// Reads the sectors with filename file into given output_buffer
 		while(directory_buffer[*pfile_entry + i] != 0) {
 			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
@@ -187,24 +203,6 @@ void executeProgram(char* program_name)
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
 }
 
-void writeSector(char* address, int sector)
-{
-	int AH = 3;	// this number tells BIOS to read a sector as opposed to write (changed to 3 for writeSector)
-	int AL = 1;	// numbers of sectors to read
-	int AX = AH * 256 + AL;
-
-	char* BX = address; // address where the data should be stored to
-
-	int CH = 0;	// track number
-	int CL = sector + 1; // relative sector number
-	int CX = CH * 256 + CL;
-
-	int DH = 0;	// head number
-	int DX = DH * 256 + 0x80;
-
-	interrupt(0x13, AX, BX, CX, DX);  
-}
-
 void terminate()
 {
 	char shellname[6];
@@ -217,3 +215,4 @@ void terminate()
 
 	executeProgram(shellname);
 }
+
