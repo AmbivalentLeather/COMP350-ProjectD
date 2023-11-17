@@ -97,16 +97,17 @@ void dir()
 			}
 			/* The problem with this part is that I don't know how to print a number.
 			 * Also, this would only print up the size of all the sectors, not size of file
+			 */
 			while (directory_buffer[file_entry + i] != '\0') {
-				// file_size += 512;
+				file_size += 512;
 				syscall(0, "H");
 				i++;
 			}
 			syscall(0, "\n\r");
 			// */
 			syscall(0, file_buffer);
-			// syscall(0, "\t");
-			// syscall(0, file_size);
+			syscall(0, "\t");
+			syscall(0, 30);
 			syscall(0, "\n\r");
 			i = 0;
 		}
