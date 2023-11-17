@@ -102,8 +102,8 @@ void dir()
 			// syscall(0, "\t");
 			// syscall(0, file_size);
 			syscall(0, "\n\r");
+			i = 0;
 		}
-		i = 0;
 		// file_size = 0;
 	}
 
