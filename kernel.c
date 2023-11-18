@@ -11,6 +11,7 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_t
 void executeProgram(char* name);
 void writeSector(char*, int);
 void deleteFile(char* filename);
+void writeFile(char*, char*, int);
 void terminate();
 
 int main()
@@ -39,6 +40,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 7: deleteFile(bx);
 			break;
+        case 8: writeFile(bx, cx, dx);
+            break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -234,6 +237,41 @@ void executeProgram(char* program_name)
     	}
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
+}
+
+void writeFile(char* buffer, char* filename, int numberOfSectors) {
+    char dir[512];
+	char map[512];
+    int file_entry = 0;
+    int sectorCounter = 0;
+
+    readSector(map, 1); // reads map sector 1 into map buffer
+	readSector(dir, 2); //reads directory sector 2 into directory buffer
+
+   // for (file_entry = 0; file_entry < 13312; file_entry += 512) {
+
+   // }
+    
+    for (file_entry = 0; file_entry < 512; file_entry += 32){ // loops through map
+        if (map[file_entry + 3] == '\0') { // checks for 0 entry, has a + 3 so it does not overwrite bootloader
+            map[file_entry + 3] = "0"; // sets that sector to 0xFF in the map
+            map[file_entry + 4] = "x";
+            map[file_entry + 5] = "F";
+            map[file_entry + 6] = "F";
+
+            
+            //I am confused on how to add the sector number to the files directory entry
+            //numberOfSectors++; // adds sector number to the files directory entry (not sure if this works or not)
+
+            // These two below wont work until 6. is figured out
+            //writeSector(buffer, sectorCounter); // writes 512 bytes from the buffer holding the file to that sector
+
+            //numberOfSectors--; // number of sectors represents how many should be written to the disk, everytime a sector is written this decrements
+            
+        }
+        sectorCounter++;
+    } 
+    
 }
 
 void terminate()
