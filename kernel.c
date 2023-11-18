@@ -17,6 +17,7 @@ void terminate();
 int main()
 {
 	makeInterrupt21();
+    //interrupt(0x21, 8, "this is a test messag", "testing", 3);
 	interrupt(0x21, 4, "shell", 0, 0);
 }
 
@@ -242,31 +243,38 @@ void executeProgram(char* program_name)
 void writeFile(char* buffer, char* filename, int numberOfSectors) {
     char dir[512];
 	char map[512];
-    int file_entry = 0;
-    int sectorCounter = 0;
+    int file_entry = 96; // variable for loop that reads through map checking for \0
+    int fillin = 0; // variable for loop that fills rest of directory with 0s
+    int sectorCounter = 0; // keeps track of the number of sectors the loop has gone through
+    int addSectorNum = 7; // keeps track of where the sector number should be added to directory entry
 
     readSector(map, 1); // reads map sector 1 into map buffer
 	readSector(dir, 2); //reads directory sector 2 into directory buffer
-
-   // for (file_entry = 0; file_entry < 13312; file_entry += 512) {
-
-   // }
     
-    for (file_entry = 0; file_entry < 512; file_entry += 32){ // loops through map
-        if (map[file_entry + 3] == '\0') { // checks for 0 entry, has a + 3 so it does not overwrite bootloader
-            map[file_entry + 3] = "0"; // sets that sector to 0xFF in the map
-            map[file_entry + 4] = "x";
-            map[file_entry + 5] = "F";
-            map[file_entry + 6] = "F";
+    for (file_entry = 96; file_entry < 512; file_entry += 32){ // loops through map, we start at ninety six because we do not want to overwrite the bootloader
+        if (map[file_entry] == '\0') { // checks for 0 entry
+            map[file_entry] = "0"; // sets that sector to 0xFF in the map
+            map[file_entry + 1] = "x";
+            map[file_entry + 2] = "F";
+            map[file_entry + 3] = "F";
 
             
             //I am confused on how to add the sector number to the files directory entry
-            //numberOfSectors++; // adds sector number to the files directory entry (not sure if this works or not)
+            // after the sixth character in the directory buffer is where you add the sector numbers
+            
+            dir[addSectorNum] = sectorCounter; // adds sector number to files directory entry
 
-            // These two below wont work until 6. is figured out
-            //writeSector(buffer, sectorCounter); // writes 512 bytes from the buffer holding the file to that sector
+            writeSector(buffer, sectorCounter); // writes 512 bytes from the buffer holding the file to that sector
 
-            //numberOfSectors--; // number of sectors represents how many should be written to the disk, everytime a sector is written this decrements
+            for(fillin = addSectorNum + 1; fillin < 512; fillin++) { // loops through and fills in the remaining bytes in directory entry to 0
+                dir[fillin] = "0"; // fill in the remaining bytes in the directory entry to 0
+            }
+            
+            addSectorNum++; // this increments so that next time a sector number is added to directory entry it does not overwrite the last
+            numberOfSectors--; // number of sectors represents how many should be written to the disk, everytime a sector is written this decrements
+
+            writeSector(map, 1); // writes map sector back to disk
+	        writeSector(dir, 2); // writes directory sector back to disk
             
         }
         sectorCounter++;
