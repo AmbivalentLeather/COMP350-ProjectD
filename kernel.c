@@ -17,7 +17,7 @@ void terminate();
 int main()
 {
 	makeInterrupt21();
-    //interrupt(0x21, 8, "this is a test messag", "testing", 3);
+	//interrupt(0x21, 8, "this is a test messag", "testing", 3);
 	interrupt(0x21, 4, "shell", 0, 0);
 }
 
@@ -41,8 +41,8 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 7: deleteFile(bx);
 			break;
-        case 8: writeFile(bx, cx, dx);
-            break;
+		case 8: writeFile(bx, cx, dx);
+			break;
 		default: printString("Error AX is invalid");
 			break;
 	}
@@ -170,6 +170,96 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 		*sectorsRead = 0;
 }
 
+// This is chase's writeFile
+void writeFile(char* buffer, char* filename, int numberOfSectors) {
+	char dir[512];
+	char map[512];
+	int file_entry = 96; // variable for loop that reads through map checking for \0
+	int fillin = 0; // variable for loop that fills rest of directory with 0s
+	int sectorCounter = 0; // keeps track of the number of sectors the loop has gone through
+	int addSectorNum = 7; // keeps track of where the sector number should be added to directory entry
+
+	readSector(map, 1); // reads map sector 1 into map buffer
+	readSector(dir, 2); //reads directory sector 2 into directory buffer
+    
+	for (file_entry = 96; file_entry < 512; file_entry += 32) { 
+		// loops through map, we start at ninety six because we do not want to overwrite the bootloader
+		if (map[file_entry] == '\0') { // checks for 0 entry
+			// sets that sector to 0xFF in the map
+			map[file_entry + 2] = "F";
+			map[file_entry + 3] = "F";
+
+            
+            	//I am confused on how to add the sector number to the files directory entry
+            	// after the sixth character in the directory buffer is where you add the sector numbers
+            
+            	dir[addSectorNum] = sectorCounter; // adds sector number to files directory entry
+
+            	writeSector(buffer, sectorCounter); // writes 512 bytes from the buffer holding the file to that sector
+
+            	for(fillin = addSectorNum + 1; fillin < 512; fillin++) { // loops through and fills in the remaining bytes in directory entry to 0
+			dir[fillin] = "0"; // fill in the remaining bytes in the directory entry to 0
+		}
+            
+		addSectorNum++; // this increments so that next time a sector number is added to directory entry it does not overwrite the last
+		numberOfSectors--; // number of sectors represents how many should be written to the disk, everytime a sector is written this decrements
+
+		writeSector(map, 1); // writes map sector back to disk
+		writeSector(dir, 2); // writes directory sector back to disk
+            
+		}
+        sectorCounter++;
+	} 
+}
+
+// This is Nick's writeFile
+void writeBFile(char* buffer, char* filename, int numberOfSectors) {
+	char dir[512];
+	char map[512];
+	int file_entry; // variable for loop that reads through map checking for \0
+	int i = 0;
+	int j = 0;
+	int directory_column = 0;
+
+	int sectorCounter = 0; // keeps track of the number of sectors the loop has gone through
+
+	readSector(map, 1); // reads map sector 1 into map buffer
+	readSector(dir, 2); //reads directory sector 2 into directory buffer
+    
+	// Find free directory entry
+	for (file_entry = 0; file_entry < 512; file_entry += 32) { 
+		if (dir[file_entry] == '\0') {
+			// Copy filename into free directory entry
+			for (i = 0; i < 6; i++) {
+				 dir[file_entry + i] = filename[i];
+				 directory_column++;
+			}
+			// Break out of the loop 
+			// We do this so file_entry remains the same, and
+			// because we have found the correct entry
+			break;
+		}
+
+	}
+
+	// Find a free sector in map
+	j = 3 * 32;
+	while (j < 512) {
+		// Set empty sector to 0xFF in map
+		if (map[j] == '\0') {
+			map[j] = 255;
+			sectorCounter++;
+		}
+		j++;
+	}
+
+	// Write sector number to directory entry
+	for (i = 0; i < sectorCounter	
+
+	writeSector(map, 1); // writes map sector back to disk
+	writeSector(dir, 2); // writes directory sector back to disk
+}
+
 void deleteFile(char* filename)
 {
 	char dir[512];
@@ -238,48 +328,6 @@ void executeProgram(char* program_name)
     	}
 
 	launchProgram(0x2000); // will not return, sets of registers and jumps to the program located at 0x2000
-}
-
-void writeFile(char* buffer, char* filename, int numberOfSectors) {
-    char dir[512];
-	char map[512];
-    int file_entry = 96; // variable for loop that reads through map checking for \0
-    int fillin = 0; // variable for loop that fills rest of directory with 0s
-    int sectorCounter = 0; // keeps track of the number of sectors the loop has gone through
-    int addSectorNum = 7; // keeps track of where the sector number should be added to directory entry
-
-    readSector(map, 1); // reads map sector 1 into map buffer
-	readSector(dir, 2); //reads directory sector 2 into directory buffer
-    
-    for (file_entry = 96; file_entry < 512; file_entry += 32){ // loops through map, we start at ninety six because we do not want to overwrite the bootloader
-        if (map[file_entry] == '\0') { // checks for 0 entry
-            map[file_entry] = "0"; // sets that sector to 0xFF in the map
-            map[file_entry + 1] = "x";
-            map[file_entry + 2] = "F";
-            map[file_entry + 3] = "F";
-
-            
-            //I am confused on how to add the sector number to the files directory entry
-            // after the sixth character in the directory buffer is where you add the sector numbers
-            
-            dir[addSectorNum] = sectorCounter; // adds sector number to files directory entry
-
-            writeSector(buffer, sectorCounter); // writes 512 bytes from the buffer holding the file to that sector
-
-            for(fillin = addSectorNum + 1; fillin < 512; fillin++) { // loops through and fills in the remaining bytes in directory entry to 0
-                dir[fillin] = "0"; // fill in the remaining bytes in the directory entry to 0
-            }
-            
-            addSectorNum++; // this increments so that next time a sector number is added to directory entry it does not overwrite the last
-            numberOfSectors--; // number of sectors represents how many should be written to the disk, everytime a sector is written this decrements
-
-            writeSector(map, 1); // writes map sector back to disk
-	        writeSector(dir, 2); // writes directory sector back to disk
-            
-        }
-        sectorCounter++;
-    } 
-    
 }
 
 void terminate()
