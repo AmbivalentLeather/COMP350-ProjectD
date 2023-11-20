@@ -162,14 +162,29 @@ void create(char* filename)
 	char stringStore[80];
 	char buffer[13312];
 	int i;
+	int heeheehoohoo = 1;
+	int sectorNumber = 1;
+	int sectorIndex = 0;
 
 	// We need to continue reading a line until the user doesn't enter anything
-	while (stringStore) {
+	while (heeheehoohoo) {
 		syscall(1, stringStore);
-		for (i = 0; stringStore[i] != '\n'; i++) {
+		for (i = 0; buffer[i] != '\n'; i++) {
 			buffer[i] = stringStore[i];
+			sectorIndex++;
+			if (i == 0 && stringStore[i] == '\r') {
+				heeheehoohoo = 0;
+			}
+		}
+		if (sectorIndex == 512) {
+			sectorNumber++;
+			sectorIndex = 0;
 		}
 	}
+	if (sectorIndex > 0)
+		syscall(8, buffer, filename, sectorNumber);
+	else
+		syscall(0, "Error: Empty file");
 }
 
 // I don't like that we're mixing [] and * since in this context they mean the same thing

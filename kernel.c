@@ -11,9 +11,7 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_t
 void executeProgram(char* name);
 void writeSector(char*, int);
 void deleteFile(char* filename);
-
-void writeBFile(char*, char*, int);
-
+void writeFile(char*, char*, int);
 void terminate();
 
 int main()
@@ -173,6 +171,8 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 
 void writeFile(char* buffer, char* filename, int numberOfSectors)
 {
+	// THIS DOES NOT WORK PROPERLY IF YOU DELETE A FILE
+	// IF YOU CLEAR A SECTOR AND THEN THERE ARE UNFREE SECTORS AFTER THAT, IT ASSUMES ALL SECTORS AFTER THE FIRST FREE SECTOR IS FREE
 	char dir[512], map[512], genericSectorBuffer[512];
 	int i, j;
 	int file_entry, antiSectorCounter, directoryColumn, sectorCounter, currentSector, totalSectors;
