@@ -11,7 +11,9 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* string_t
 void executeProgram(char* name);
 void writeSector(char*, int);
 void deleteFile(char* filename);
-void writeFile(char*, char*, int);
+
+void writeBFile(char*, char*, int);
+
 void terminate();
 
 int main()
@@ -41,7 +43,7 @@ void handleInterrupt21(int ax, char* bx, int cx, int dx)
 			break;
 		case 7: deleteFile(bx);
 			break;
-		case 8: writeFile(bx, cx, dx);
+		case 8: writeBFile(bx, cx, dx);
 			break;
 		default: printString("Error AX is invalid");
 			break;
@@ -213,15 +215,18 @@ void writeFile(char* buffer, char* filename, int numberOfSectors) {
 }
 
 // This is Nick's writeFile
-void writeBFile(char* buffer, char* filename, int numberOfSectors) {
+void writeBFile(char* buffer, char* filename, int numberOfSectors)
+{
 	char dir[512];
 	char map[512];
 	int file_entry; // variable for loop that reads through map checking for \0
 	int i = 0;
 	int j = 0;
-	int directory_column = 0;
+	int directoryColumn = 0;
 
+	int totalSectors;
 	int sectorCounter = 0; // keeps track of the number of sectors the loop has gone through
+	int antiSectorCounter;
 
 	readSector(map, 1); // reads map sector 1 into map buffer
 	readSector(dir, 2); //reads directory sector 2 into directory buffer
@@ -232,7 +237,6 @@ void writeBFile(char* buffer, char* filename, int numberOfSectors) {
 			// Copy filename into free directory entry
 			for (i = 0; i < 6; i++) {
 				 dir[file_entry + i] = filename[i];
-				 directory_column++;
 			}
 			// Break out of the loop 
 			// We do this so file_entry remains the same, and
@@ -243,18 +247,28 @@ void writeBFile(char* buffer, char* filename, int numberOfSectors) {
 	}
 
 	// Find a free sector in map
-	j = 3 * 32;
-	while (j < 512) {
-		// Set empty sector to 0xFF in map
+	j = 3;
+	while (j < 512 && sectorCounter < numberOfSectors) {
+		// Set empty sector(s) to 0xFF in map
 		if (map[j] == '\0') {
-			map[j] = 255;
+			map[j] = 0xFF;
 			sectorCounter++;
 		}
+
 		j++;
 	}
 
-	// Write sector number to directory entry
-	for (i = 0; i < sectorCounter	
+	directoryColumn = (file_entry + 6);
+	totalSectors = j;
+	antiSectorCounter = (totalSectors - sectorCounter);
+	
+	// Write the numbers of the sectors being used by the file 
+	// immediately after the filename
+	i = 0;
+	while (i < sectorCounter) {
+		dir[directoryColumn + i] = antiSectorCounter++;
+		i++;
+	}
 
 	writeSector(map, 1); // writes map sector back to disk
 	writeSector(dir, 2); // writes directory sector back to disk

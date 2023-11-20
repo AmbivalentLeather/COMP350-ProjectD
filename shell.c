@@ -21,6 +21,7 @@ int main()
 		char* cmdExec = "exec";
 		char* cmdDir = "dir";
 		char* cmdDel = "del";
+		char* cmdWrite = "write";
 		
 		syscall(0, "\rC> ");
 		syscall(1, userInput);
@@ -43,6 +44,9 @@ int main()
 		else if (stringCompare(cmdString, cmdDel)) {
 			argFinder(userInput, fileName, 1);
 			del(fileName);
+		}
+		else if (stringCompare(cmdString, cmdWrite)) {
+			syscall(8, "this is a test message", "alphab", 8);
 		}
 		else {
 			syscall(0, "Bad command!\n\r");
