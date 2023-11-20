@@ -162,7 +162,8 @@ void create(char* filename)
 	char buffer[13312];
 	int i;
 
-	while (stringStore != '\n') {
+	// We need to continue reading a line until the user doesn't enter anything
+	while (stringStore) {
 		syscall(1, stringStore);
 		for (i = 0; stringStore[i] != '\n'; i++) {
 			buffer[i] = stringStore[i];
