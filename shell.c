@@ -20,9 +20,8 @@ int main()
 {
 	while(1) {
 		char userInput[LINE_SIZE];
-		char cmdString[10];
-		char fileName[12];
-		char fileName1[12], fileName2[12];
+		char cmdString[12];
+		char arg1[12], arg2[12], arg3[12], arg4[12];
 
 		char* cmdType = "type";
 		char* cmdExec = "exec";
@@ -40,28 +39,28 @@ int main()
 		// enters more characters in the command than are checked
 
 		if (stringCompare(cmdString, cmdType)) {
-			argFinder(userInput, fileName, 1);
-			type(fileName);
+			argFinder(userInput, arg1, 1);
+			type(arg1);
 		}
 		else if (stringCompare(cmdString, cmdExec)) {
-			argFinder(userInput, fileName, 1);
-			exec(fileName);
+			argFinder(userInput, arg1, 1);
+			exec(arg1);
 		}
 		else if (stringCompare(cmdString, cmdDir)) {
             		dir();
         	}
 		else if (stringCompare(cmdString, cmdDel)) {
-			argFinder(userInput, fileName, 1);
-			del(fileName);
+			argFinder(userInput, arg1, 1);
+			del(arg1);
 		}
 		else if (stringCompare(cmdString, cmdCopy)) {
-			argFinder(userInput, fileName1, 1);
-			argFinder(userInput, fileName2, 2);
-			copy(fileName1, fileName2);
+			argFinder(userInput, arg1, 1);
+			argFinder(userInput, arg2, 2);
+			copy(arg1, arg2);
 		}
 		else if (stringCompare(cmdString, cmdCreate)) {
-			argFinder(userInput, fileName, 1);
-			create(fileName);
+			argFinder(userInput, arg1, 1);
+			create(arg1);
 		}
 		else {
 			syscall(0, "Bad command!\n\r");
