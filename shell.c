@@ -46,7 +46,7 @@ int main()
 			del(fileName);
 		}
 		else if (stringCompare(cmdString, cmdWrite)) {
-			syscall(8, "this is a test message", "alphab", 1);
+			syscall(0, "Nothing hun. \n\r");
 		}
 		else {
 			syscall(0, "Bad command!\n\r");
@@ -62,8 +62,10 @@ void type(char* inputFileName)
 	int sectorsRead;
 	syscall(3, inputFileName, buffer, &sectorsRead);
 
-	if (sectorsRead > 0)
+	if (sectorsRead > 0) {
 		syscall(0, buffer);
+		syscall(0, "\n\r");
+	}
 	else
 		syscall(0, "File not found.\r\n");
 }

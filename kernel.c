@@ -19,7 +19,7 @@ void terminate();
 int main()
 {
 	makeInterrupt21();
-	//interrupt(0x21, 8, "this is a test messag", "testing", 3);
+	interrupt(0x21, 8, "This is a test message", "alphab", 1);
 	interrupt(0x21, 4, "shell", 0, 0);
 }
 
@@ -217,6 +217,8 @@ void writeFile(char* buffer, char* filename, int numberOfSectors) {
 // This is Nick's writeFile
 void writeBFile(char* buffer, char* filename, int numberOfSectors)
 {
+	// NOTE: THIS CODE IS BAD AND SLIGHTLY BUGGY
+	// FIX THE BAD BEFORE THE BUGS
 	char dir[512];
 	char map[512];
 	char genericSectorBuffer[512];
@@ -225,63 +227,57 @@ void writeBFile(char* buffer, char* filename, int numberOfSectors)
 	// Simple iterator variables
 	int i, j;
 
-	int totalSectors;
-	int sectorCounter = 0; // keeps track of the number of sectors the loop has gone through
-	int antiSectorCounter;
-	int directoryColumn = 0;
+	int antiSectorCounter, directoryColumn, sectorCounter, currentSector, totalSectors;
 
 	readSector(map, 1); // reads map sector 1 into map buffer
 	readSector(dir, 2); //reads directory sector 2 into directory buffer
     
-	// Find free directory entry
+	// Find a free sector in map
+	for (totalSectors = 3; totalSectors < 512 && sectorCounter < numberOfSectors; totalSectors++) {
+		// Set empty sector(s) to 0xFF in map
+		if (map[totalSectors] == '\0') {
+			map[totalSectors] = 0xFF;
+			sectorCounter++;
+		}
+	}
+
+	antiSectorCounter = (totalSectors - sectorCounter);
+
+	// Find free directory entry and append sector numbers
 	for (file_entry = 0; file_entry < 512; file_entry += 32) { 
 		if (dir[file_entry] == '\0') {
 			// Copy filename into free directory entry
 			for (i = 0; i < 6; i++) {
 				 dir[file_entry + i] = filename[i];
 			}
+			// Store the location in dir for the sector numbers
+			directoryColumn = file_entry + 6;
+
+			// Write the numbers of the sectors being used by
+			// the file immediately after the filename
+			for (i = 0; i < sectorCounter; i++) {
+				dir[directoryColumn + i] = antiSectorCounter++;
+				i++;
+			}
 			// Break out of the loop after finding the
 			// correct entry
 			break;
 		}
-
 	}
-
-	// Find a free sector in map
-	j = 3; // Skip the first three sectors no matter what
-	while (j < 512 && sectorCounter < numberOfSectors) {
-		// Set empty sector(s) to 0xFF in map
-		if (map[j] == '\0') {
-			map[j] = 0xFF;
-			sectorCounter++;
-		}
-
-		j++;
-	}
-
-	directoryColumn = (file_entry + 6);
-	totalSectors = j;
-	antiSectorCounter = (totalSectors - sectorCounter);
 	
-	// Write the numbers of the sectors being used by the file immediately after the filename
-	i = 0;
-	while (i < sectorCounter) {
-		dir[directoryColumn + i] = antiSectorCounter++;
-		i++;
-	}
-
-	i = 0;
-	j = 0;
+	// This loop reads the buffer into its assigned sectors
+	// This is the most disgusting part of the code
 	antiSectorCounter = (totalSectors - sectorCounter);
-	while (i < sectorCounter) {
-		readSector(genericSectorBuffer, antiSectorCounter);
-		while (j < 512) {
+	for (i = 0; i < sectorCounter; i++) {
+		currentSector = antiSectorCounter + i;
+		readSector(genericSectorBuffer, currentSector);
+		// This loop writes 512 bytes from the buffer into the sector i
+		for (j = 0; j < 512; j++) {
+			// genericSectorBuffer increments by 512
+			// buffer increments by the NEXT 512 bytes starting at 0, then 1, then 2 etc
 			genericSectorBuffer[j] = buffer[j + (i * 512)];
-			j++;
 		}
-		j = 0;
-		writeSector(genericSectorBuffer, antiSectorCounter);
-		i++;
+		writeSector(genericSectorBuffer, currentSector);
 	}
 
 	writeSector(map, 1); // writes map sector back to disk
