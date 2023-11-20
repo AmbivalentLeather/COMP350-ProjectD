@@ -24,6 +24,7 @@ int main()
 		char* cmdDir = "dir";
 		char* cmdDel = "del";
 		char* cmdCopy = "copy";
+		char* cmdCreate = "create";
 		
 		syscall(0, "\rC> ");
 		syscall(1, userInput);
@@ -52,6 +53,10 @@ int main()
 			argFinder(userInput, fileName1, 1);
 			argFinder(userInput, fileName2, 2);
 			copy(fileName1, fileName2);
+		}
+		else if (stringCompare(cmdString, cmdCreate)) {
+			argFinder(userInput, fileName, 1);
+			create(fileName);
 		}
 		else {
 			syscall(0, "Bad command!\n\r");
@@ -149,6 +154,20 @@ void copy(char* file1, char* file2)
 		syscall(8, buffer, file2, sectorsRead);
 	else
 		syscall(0, "File not found.\r\n");
+}
+
+void create(char* filename)
+{
+	char stringStore[80];
+	char buffer[13312];
+	int i;
+
+	while (stringStore != '\n') {
+		syscall(1, stringStore);
+		for (i = 0; stringStore[i] != '\n'; i++) {
+			buffer[i] = stringStore[i];
+		}
+	}
 }
 
 // I don't like that we're mixing [] and * since in this context they mean the same thing

@@ -19,7 +19,6 @@ void terminate();
 int main()
 {
 	makeInterrupt21();
-	// interrupt(0x21, 8, "This is a test message", "alphab", 1);
 	interrupt(0x21, 4, "shell", 0, 0);
 }
 
