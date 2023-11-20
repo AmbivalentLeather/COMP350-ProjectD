@@ -175,45 +175,51 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 	// IF YOU CLEAR A SECTOR AND THEN THERE ARE UNFREE SECTORS AFTER THAT, IT ASSUMES ALL SECTORS AFTER THE FIRST FREE SECTOR IS FREE
 	char dir[512], map[512], genericSectorBuffer[512];
 	int i, j;
-	int file_entry, antiSectorCounter, directoryColumn, sectorCounter, currentSector, totalSectors;
+	int file_entry, directoryColumn, sectorCounter, currentSector, totalSectors;
+	// Integer array to store the available sectors
+	int freeSectors[28];
 
 	readSector(map, 1); // reads map sector 1 into map buffer
 	readSector(dir, 2); //reads directory sector 2 into directory buffer
     
+	i = 0;
 	// Find a free sector in map
 	for (totalSectors = 3; totalSectors < 512 && sectorCounter < numberOfSectors; totalSectors++) {
 		// Set empty sector(s) to 0xFF in map
 		if (map[totalSectors] == '\0') {
 			map[totalSectors] = 0xFF;
 			sectorCounter++;
+			freeSectors[i] = totalSectors;
+			i++;
 		}
 	}
-
-	antiSectorCounter = (totalSectors - sectorCounter);
 
 	// Find free directory entry, append filename and sector numbers
 	for (file_entry = 0; file_entry < 512; file_entry += 32) { 
 		if (dir[file_entry] == '\0') {
 			// Copy filename into free directory entry
-			for (i = 0; i < 6; i++)
-				 dir[file_entry + i] = filename[i];
+			for (i = 0; i < 6; i++) {
+				if (filename[i] == '\0')
+					dir[file_entry + i] = '\0';
+				dir[file_entry + i] = filename[i];
+			}
 
 			// Store the location in dir for the sector numbers
-			directoryColumn = file_entry + 6;
+			directoryColumn = file_entry + 7;
 
 			// Write sector numbers
-			for (i = 0; i < sectorCounter; i++)
-				dir[directoryColumn + i] = antiSectorCounter++;
+			// Added i < 26 because there are only 26 available sectors
+			for (i = 0; i < sectorCounter && i < 26; i++)
+				dir[directoryColumn + i] = freeSectors[i];
 
 			break;
 		}
 	}
 	
 	// Read the buffer into assigned sectors
-	antiSectorCounter = (totalSectors - sectorCounter);
-	for (i = 0; i < sectorCounter; i++) {
-		currentSector = antiSectorCounter + i;
-		
+	// If there are more than 26 sectors assigned this whole thing will break
+	for (i = 0; i < sectorCounter && sectorCounter < 26; i++) {
+		currentSector = freeSectors[i];
 		readSector(genericSectorBuffer, currentSector);
 
 		// This loop writes 512 bytes from the buffer into the sector i
