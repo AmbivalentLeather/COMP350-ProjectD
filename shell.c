@@ -46,7 +46,7 @@ int main()
 			del(fileName);
 		}
 		else if (stringCompare(cmdString, cmdWrite)) {
-			syscall(8, "this is a test message", "alphab", 8);
+			syscall(8, "this is a test message", "alphab", 1);
 		}
 		else {
 			syscall(0, "Bad command!\n\r");
@@ -104,14 +104,14 @@ void dir()
 			 */
 			while (directory_buffer[file_entry + i] != '\0') {
 				file_size += 512;
-				syscall(0, "H");
+				//syscall(0, "H");
 				i++;
 			}
-			syscall(0, "\n\r");
+			//syscall(0, "\n\r");
 			// */
 			syscall(0, file_buffer);
-			syscall(0, "\t");
-			syscall(0, 30);
+			//syscall(0, "\t");
+			//syscall(0, 30);
 			syscall(0, "\n\r");
 			i = 0;
 		}
