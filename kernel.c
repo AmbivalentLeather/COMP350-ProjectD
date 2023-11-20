@@ -14,6 +14,9 @@ void deleteFile(char* filename);
 void writeFile(char*, char*, int);
 void terminate();
 
+#define SECTOR_SIZE 512
+#define MAX_SECTORS 26
+
 int main()
 {
 	makeInterrupt21();
@@ -145,7 +148,7 @@ void writeSector(char* address, int sector)
 
 void readFile(char* filename, char* output_buffer, int* sectorsRead)
 {
-	char directory_buffer[512];
+	char directory_buffer[SECTOR_SIZE];
 	int i = 0;
 
 	int file_entry = 0;
@@ -161,7 +164,7 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 		// Reads the sectors with filename file into given output_buffer
 		while(directory_buffer[*pfile_entry + i] != 0) {
 			readSector(output_buffer, directory_buffer[*pfile_entry + 6 + i]);
-			output_buffer += 512;
+			output_buffer += SECTOR_SIZE;
 			++*sectorsRead;
 			++i;
 		}
@@ -173,18 +176,18 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 {
 	// THIS DOES NOT WORK PROPERLY IF YOU DELETE A FILE
 	// IF YOU CLEAR A SECTOR AND THEN THERE ARE UNFREE SECTORS AFTER THAT, IT ASSUMES ALL SECTORS AFTER THE FIRST FREE SECTOR IS FREE
-	char dir[512], map[512], genericSectorBuffer[512];
+	char dir[SECTOR_SIZE], map[SECTOR_SIZE], genericSectorBuffer[SECTOR_SIZE];
 	int i, j;
 	int file_entry, directoryColumn, sectorCounter, currentSector, totalSectors;
 	// Integer array to store the available sectors
-	int freeSectors[28];
+	int freeSectors[MAX_SECTORS + 5]; // + 5 for good measure
 
 	readSector(map, 1); // reads map sector 1 into map buffer
 	readSector(dir, 2); //reads directory sector 2 into directory buffer
     
 	i = 0;
 	// Find a free sector in map
-	for (totalSectors = 3; totalSectors < 512 && sectorCounter < numberOfSectors; totalSectors++) {
+	for (totalSectors = 3; totalSectors < SECTOR_SIZE && sectorCounter < numberOfSectors; totalSectors++) {
 		// Set empty sector(s) to 0xFF in map
 		if (map[totalSectors] == '\0') {
 			map[totalSectors] = 0xFF;
@@ -195,7 +198,7 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 	}
 
 	// Find free directory entry, append filename and sector numbers
-	for (file_entry = 0; file_entry < 512; file_entry += 32) { 
+	for (file_entry = 0; file_entry < SECTOR_SIZE; file_entry += 32) { 
 		if (dir[file_entry] == '\0') {
 			// Copy filename into free directory entry
 			for (i = 0; i < 6; i++) {
@@ -209,22 +212,22 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 
 			// Write sector numbers
 			// Added i < 26 because there are only 26 available sectors
-			for (i = 0; i < sectorCounter && i < 26; i++)
+			for (i = 0; i < sectorCounter && i < MAX_SECTORS; i++)
 				dir[directoryColumn + i] = freeSectors[i];
 
 			break;
 		}
 	}
 	
-	// Read the buffer into assigned sectors
+	// Write the given buffer into necessary sectors
 	// If there are more than 26 sectors assigned this whole thing will break
-	for (i = 0; i < sectorCounter && sectorCounter < 26; i++) {
+	for (i = 0; i < sectorCounter && sectorCounter < MAX_SECTORS; i++) {
 		currentSector = freeSectors[i];
 		readSector(genericSectorBuffer, currentSector);
 
 		// This loop writes 512 bytes from the buffer into the sector i
-		for (j = 0; j < 512; j++)
-			genericSectorBuffer[j] = buffer[j + (i * 512)];
+		for (j = 0; j < SECTOR_SIZE; j++)
+			genericSectorBuffer[j] = buffer[j + (i * SECTOR_SIZE)];
 
 		writeSector(genericSectorBuffer, currentSector);
 	}
@@ -235,8 +238,7 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 
 void deleteFile(char* filename)
 {
-	char dir[512];
-	char map[512];
+	char dir[SECTOR_SIZE], map[SECTOR_SIZE];
 	int i = 0;
 	int mapIndex = 0;
 
@@ -267,9 +269,10 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename
 {
 	int correctIndex = 0;
 	int i = 0;
+	int DIR_LINE_LENGTH = 32;
 
 	// Check every line in directory_buffer, incrementing 32 to move to the next line
-	for (*file_entry = 0; *file_entry < 512; *file_entry += 32){
+	for (*file_entry = 0; *file_entry < SECTOR_SIZE; *file_entry += DIR_LINE_LENGTH){
 		// Compare the first 6 characters to the given filename_to_beat
 		while (i < 6) {
 			if(directory_buffer[*file_entry + i] != filename_to_beat[i])
@@ -288,14 +291,14 @@ int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename
 
 void executeProgram(char* program_name)
 {
-    	char buffer[13312];
+    	char buffer[SECTOR_SIZE * MAX_SECTORS];
     	int sectorsRead;
 	int offset = 0;
 
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
-    	for (offset = 0; offset < sectorsRead * 512; offset++) { 
+    	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
         	// putInMemory(int segment, int address, char character)
          	putInMemory(0x2000, offset, buffer[offset]); 
     	}

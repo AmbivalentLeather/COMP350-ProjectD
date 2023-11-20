@@ -12,10 +12,14 @@ void del(char* address);
 void copy(char* file1, char* file2);
 void create(char* filename);
 
+#define LINE_SIZE 80
+#define SECTOR_SIZE 512
+#define MAX_SECTORS 26
+
 int main()
 {
 	while(1) {
-		char userInput[80];
+		char userInput[LINE_SIZE];
 		char cmdString[10];
 		char fileName[12];
 		char fileName1[12], fileName2[12];
@@ -69,7 +73,7 @@ int main()
 
 void type(char* inputFileName)
 {
-	char buffer[13312]; /*this is the maximum size of a file*/
+	char buffer[SECTOR_SIZE * MAX_SECTORS]; /*this is the maximum size of a file*/
 	int sectorsRead;
 	syscall(3, inputFileName, buffer, &sectorsRead);
 
@@ -81,7 +85,7 @@ void type(char* inputFileName)
 
 void exec(char* inputFileName)
 {
-	char buffer[13312]; /*this is the maximum size of a file*/
+	char buffer[SECTOR_SIZE * MAX_SECTORS]; /*this is the maximum size of a file*/
 	int sectorsRead;
 	syscall(3, inputFileName, buffer, &sectorsRead);
 
@@ -93,17 +97,15 @@ void exec(char* inputFileName)
 
 void dir()
 {
-	char directory_buffer[512];
-	char file_buffer[10];
+	char directory_buffer[SECTOR_SIZE], file_buffer[10];
 	int i = 0;
 
 	int file_size = 0;
-
 	int file_entry = 0;
 
 	syscall(2, directory_buffer, 2);
 
-	for (file_entry = 0; file_entry < 512; file_entry += 32){
+	for (file_entry = 0; file_entry < SECTOR_SIZE; file_entry += 32){
 		if (directory_buffer[file_entry] != '\0') {
 			while(i < 6){
 				file_buffer[i] = directory_buffer[file_entry + i];
@@ -113,7 +115,7 @@ void dir()
 			 * Also, this would only print up the size of all the sectors, not size of file
 			 */
 			while (directory_buffer[file_entry + i] != '\0') {
-				file_size += 512;
+				file_size += SECTOR_SIZE;
 				//syscall(0, "H");
 				i++;
 			}
@@ -132,7 +134,7 @@ void dir()
 
 void del(char* filename)
 {
-	char buffer[13312]; /*this is the maximum size of a file*/
+	char buffer[SECTOR_SIZE * MAX_SECTORS]; /*this is the maximum size of a file*/
 	int sectorsRead;
 	syscall(3, filename, buffer, &sectorsRead);
 
@@ -147,7 +149,7 @@ void del(char* filename)
 
 void copy(char* file1, char* file2)
 {
-	char buffer[13312]; /*this is the maximum size of a file*/
+	char buffer[SECTOR_SIZE * MAX_SECTORS]; /*this is the maximum size of a file*/
 	int sectorsRead;
 	syscall(3, file1, buffer, &sectorsRead);
 	
@@ -159,8 +161,8 @@ void copy(char* file1, char* file2)
 
 void create(char* filename)
 {
-	char stringStore[80];
-	char buffer[13312];
+	char stringStore[LINE_SIZE];
+	char buffer[SECTOR_SIZE * MAX_SECTORS];
 	int i;
 	int heeheehoohoo = 1;
 	int sectorNumber = 1;
@@ -176,7 +178,7 @@ void create(char* filename)
 				heeheehoohoo = 0;
 			}
 		}
-		if (sectorIndex == 512) {
+		if (sectorIndex == SECTOR_SIZE) {
 			sectorNumber++;
 			sectorIndex = 0;
 		}
