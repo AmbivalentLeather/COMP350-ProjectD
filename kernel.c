@@ -19,7 +19,7 @@ void terminate();
 int main()
 {
 	makeInterrupt21();
-	interrupt(0x21, 8, "This is a test message", "alphab", 1);
+	// interrupt(0x21, 8, "This is a test message", "alphab", 1);
 	interrupt(0x21, 4, "shell", 0, 0);
 }
 
@@ -172,6 +172,7 @@ void readFile(char* filename, char* output_buffer, int* sectorsRead)
 		*sectorsRead = 0;
 }
 
+/*
 // This is chase's writeFile
 void writeFile(char* buffer, char* filename, int numberOfSectors) {
 	char dir[512];
@@ -213,21 +214,14 @@ void writeFile(char* buffer, char* filename, int numberOfSectors) {
         sectorCounter++;
 	} 
 }
+*/
 
 // This is Nick's writeFile
 void writeBFile(char* buffer, char* filename, int numberOfSectors)
 {
-	// NOTE: THIS CODE IS BAD AND SLIGHTLY BUGGY
-	// FIX THE BAD BEFORE THE BUGS
-	char dir[512];
-	char map[512];
-	char genericSectorBuffer[512];
-	int file_entry; // variable for loop that reads through map checking for \0
-
-	// Simple iterator variables
+	char dir[512], map[512], genericSectorBuffer[512];
 	int i, j;
-
-	int antiSectorCounter, directoryColumn, sectorCounter, currentSector, totalSectors;
+	int file_entry, antiSectorCounter, directoryColumn, sectorCounter, currentSector, totalSectors;
 
 	readSector(map, 1); // reads map sector 1 into map buffer
 	readSector(dir, 2); //reads directory sector 2 into directory buffer
@@ -243,40 +237,35 @@ void writeBFile(char* buffer, char* filename, int numberOfSectors)
 
 	antiSectorCounter = (totalSectors - sectorCounter);
 
-	// Find free directory entry and append sector numbers
+	// Find free directory entry, append filename and sector numbers
 	for (file_entry = 0; file_entry < 512; file_entry += 32) { 
 		if (dir[file_entry] == '\0') {
 			// Copy filename into free directory entry
-			for (i = 0; i < 6; i++) {
+			for (i = 0; i < 6; i++)
 				 dir[file_entry + i] = filename[i];
-			}
+
 			// Store the location in dir for the sector numbers
 			directoryColumn = file_entry + 6;
 
-			// Write the numbers of the sectors being used by
-			// the file immediately after the filename
-			for (i = 0; i < sectorCounter; i++) {
+			// Write sector numbers
+			for (i = 0; i < sectorCounter; i++)
 				dir[directoryColumn + i] = antiSectorCounter++;
-				i++;
-			}
-			// Break out of the loop after finding the
-			// correct entry
+
 			break;
 		}
 	}
 	
-	// This loop reads the buffer into its assigned sectors
-	// This is the most disgusting part of the code
+	// Read the buffer into assigned sectors
 	antiSectorCounter = (totalSectors - sectorCounter);
 	for (i = 0; i < sectorCounter; i++) {
 		currentSector = antiSectorCounter + i;
+		
 		readSector(genericSectorBuffer, currentSector);
+
 		// This loop writes 512 bytes from the buffer into the sector i
-		for (j = 0; j < 512; j++) {
-			// genericSectorBuffer increments by 512
-			// buffer increments by the NEXT 512 bytes starting at 0, then 1, then 2 etc
+		for (j = 0; j < 512; j++)
 			genericSectorBuffer[j] = buffer[j + (i * 512)];
-		}
+
 		writeSector(genericSectorBuffer, currentSector);
 	}
 
