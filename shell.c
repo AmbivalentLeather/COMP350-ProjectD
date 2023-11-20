@@ -10,6 +10,7 @@ void numOfArgs(char*, int*);
 void dir();
 void del(char* address);
 void copy(char* file1, char* file2);
+void create(char* filename);
 
 int main()
 {
