@@ -9,6 +9,7 @@ void argFinder(char*, char*, int);
 void numOfArgs(char*, int*);
 void dir();
 void del(char* address);
+void copy(char* file1, char* file2);
 
 int main()
 {
@@ -16,19 +17,21 @@ int main()
 		char userInput[80];
 		char cmdString[10];
 		char fileName[12];
+		char fileName1[12], fileName2[12];
 
 		char* cmdType = "type";
 		char* cmdExec = "exec";
 		char* cmdDir = "dir";
 		char* cmdDel = "del";
-		char* cmdWrite = "write";
+		char* cmdCopy = "copy";
 		
 		syscall(0, "\rC> ");
 		syscall(1, userInput);
 	
 		argFinder(userInput, cmdString, 0);
 		// NOTE: I want to eventually use numOfArgs to report an error if the user
-		// enters more arguments than are expected of the command
+		// enters more arguments than are expected of the command AND when the user
+		// enters more characters in the command than are checked
 
 		if (stringCompare(cmdString, cmdType)) {
 			argFinder(userInput, fileName, 1);
@@ -45,8 +48,10 @@ int main()
 			argFinder(userInput, fileName, 1);
 			del(fileName);
 		}
-		else if (stringCompare(cmdString, cmdWrite)) {
-			syscall(0, "Nothing hun. \n\r");
+		else if (stringCompare(cmdString, cmdCopy)) {
+			argFinder(userInput, fileName1, 1);
+			argFinder(userInput, fileName2, 2);
+			copy(fileName1, fileName2);
 		}
 		else {
 			syscall(0, "Bad command!\n\r");
@@ -62,17 +67,14 @@ void type(char* inputFileName)
 	int sectorsRead;
 	syscall(3, inputFileName, buffer, &sectorsRead);
 
-	if (sectorsRead > 0) {
+	if (sectorsRead > 0)
 		syscall(0, buffer);
-		syscall(0, "\n\r");
-	}
 	else
 		syscall(0, "File not found.\r\n");
 }
 
 void exec(char* inputFileName)
 {
-
 	char buffer[13312]; /*this is the maximum size of a file*/
 	int sectorsRead;
 	syscall(3, inputFileName, buffer, &sectorsRead);
@@ -135,6 +137,18 @@ void del(char* filename)
 	else
 		syscall(0, "File not found.\r\n");
 
+}
+
+void copy(char* file1, char* file2)
+{
+	char buffer[13312]; /*this is the maximum size of a file*/
+	int sectorsRead;
+	syscall(3, file1, buffer, &sectorsRead);
+	
+	if (sectorsRead > 0)
+		syscall(8, buffer, file2, sectorsRead);
+	else
+		syscall(0, "File not found.\r\n");
 }
 
 // I don't like that we're mixing [] and * since in this context they mean the same thing
