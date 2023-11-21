@@ -208,7 +208,7 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 			}
 
 			// Store the location in dir for the sector numbers
-			directoryColumn = file_entry + 7;
+			directoryColumn = file_entry + 6;
 
 			// Write sector numbers
 			// Added i < 26 because there are only 26 available sectors

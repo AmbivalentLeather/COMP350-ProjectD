@@ -162,9 +162,9 @@ void create(char* filename)
 {
 	char stringStore[LINE_SIZE];
 	char buffer[SECTOR_SIZE * MAX_SECTORS];
-	int i;
 	int sectorNumber = 1;
 	int sectorIndex = 0;
+	int i;
 
 	// We need to continue reading a line until the user doesn't enter anything
 	while (1) {
@@ -173,22 +173,22 @@ void create(char* filename)
 		if (stringStore[0] == '\r')
 			break;
 
-		// I think this loop is where it doesn't work
-		for (i = 0; buffer[i] != '\r'; i++) {
-			buffer[i] = stringStore[i];
+		// Iterate through the line until the carraige return
+		for (i = 0; stringStore[i] != '\r'; i++) {
+			buffer[sectorIndex] = stringStore[i];
 			sectorIndex++;
 		}
 
-		if (sectorIndex == SECTOR_SIZE) {
-			sectorNumber++;
-			sectorIndex = 0;
-		}
-	}
+		// Add new line characters so the lines are actually lines
+		buffer[sectorIndex] = '\r';
+		buffer[sectorIndex + 1] = '\n';
+		sectorIndex += 2;
 
-	if (sectorIndex > 0)
-		syscall(8, buffer, filename, sectorNumber);
-	else
-		syscall(0, "Error: Empty file");
+		// If we've read 512 characters, increment the sectorIndex
+		if (sectorIndex % SECTOR_SIZE)
+			sectorNumber++;
+	}
+	syscall(8, buffer, filename, sectorNumber);
 }
 
 // I don't like that we're mixing [] and * since in this context they mean the same thing
