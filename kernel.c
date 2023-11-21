@@ -211,7 +211,6 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 			directoryColumn = file_entry + 6;
 
 			// Write sector numbers
-			// Added i < 26 because there are only 26 available sectors
 			for (i = 0; i < sectorCounter && i < MAX_SECTORS; i++)
 				dir[directoryColumn + i] = freeSectors[i];
 
@@ -267,6 +266,8 @@ void deleteFile(char* filename)
 
 int directoryLineCompare(char* directory_buffer, int* file_entry, char* filename_to_beat)
 {
+	// N: I still don't like the way this function is written because of the dependance
+	// on six characters. Yes I wrote it. Yes it works. No I don't like it.
 	int correctIndex = 0;
 	int i = 0;
 	int DIR_LINE_LENGTH = 32;
@@ -298,6 +299,7 @@ void executeProgram(char* program_name)
 	// Read program_name into buffer
     	readFile(program_name, buffer, &sectorsRead);
 
+	// Put the buffer into memory
     	for (offset = 0; offset < sectorsRead * SECTOR_SIZE; offset++) { 
         	// putInMemory(int segment, int address, char character)
          	putInMemory(0x2000, offset, buffer[offset]); 
