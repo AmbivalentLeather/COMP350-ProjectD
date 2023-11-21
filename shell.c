@@ -12,6 +12,8 @@ void del(char* address);
 void copy(char* file1, char* file2);
 void create(char* filename);
 
+void jank(int inputNum, char* output);
+
 #define LINE_SIZE 80
 #define SECTOR_SIZE 512
 #define MAX_SECTORS 26
@@ -29,7 +31,6 @@ int main()
 		char* cmdDel = "del";
 		char* cmdCopy = "copy";
 		char* cmdCreate = "create";
-		
 		syscall(0, "\rC> ");
 		syscall(1, userInput);
 	
@@ -236,5 +237,20 @@ void argFinder(char* input, char* output, int whichArg)
 	}
 
 	output[outputIndex] = '\0';
+}
+
+void jank(int inputNum, char* output)
+{
+	switch(inputNum)
+	{
+		case 512: output = "512";
+			  break;
+		case 1024: output = "1024";
+			   break;
+		case 1536: output = "1536";
+			   break;
+		case ;
+	}
+
 }
 
