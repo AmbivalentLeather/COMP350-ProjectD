@@ -101,7 +101,9 @@ char* readString(char* inputArray)
 		++i;
 	}
 	inputArray[i] = 0xd;	// Add return character to character array
-	inputArray[i + 1] = 0x0;	// Add null character to character array
+	// I don't think the directions asked for the linefeed chr but I'm adding it
+	inputArray[i + 1] = 0xa;	// Added 2023-11-21T12:53
+	inputArray[i + 2] = 0x0;	// Add null character to character array
 
 	interrupt(0x10, 0xe * 256 + 0xd, 0, 0, 0); // Print return character
 	interrupt(0x10, 0xe * 256 + 0xa, 0, 0, 0); // Print line feed character
@@ -195,6 +197,13 @@ void writeFile(char* buffer, char* filename, int numberOfSectors)
 			freeSectors[i] = totalSectors;
 			i++;
 		}
+
+		/* Supposed to return in there aren't any free sectors
+		 * Function returns void?
+		if (sectorCounter == numberOfSectors - 1 && freeSectors[0] == '\0') {
+			return 0;
+		}
+		*/
 	}
 
 	// Find free directory entry, append filename and sector numbers

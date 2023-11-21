@@ -4,9 +4,10 @@
  */
 void type(char* inputFileName);
 void exec(char* inputFileName);
-int stringCompare(char* given, char* compared_to);
+int stringCompare(char given[], char goal[]);
 void argFinder(char*, char*, int);
-void numOfArgs(char*, int*);
+int numberOfArguments(char* input);
+void argErrorHandler(int givenNumOfArgs, int expectedNumOfArgs);
 void dir();
 void del(char* address);
 void copy(char* file1, char* file2);
@@ -35,6 +36,8 @@ int main()
 		char cmdString[12];
 		char arg1[12], arg2[12];
 
+		int argNum;
+
 		char* cmdType = "type";
 		char* cmdExec = "exec";
 		char* cmdDir = "dir";
@@ -44,17 +47,21 @@ int main()
 
 		syscall(0, "\rC> ");
 		syscall(1, userInput);
-	
+
+		argNum = numberOfArguments(userInput);
+
 		argFinder(userInput, cmdString, 0);
 		// NOTE: I want to eventually use numOfArgs to report an error if the user
 		// enters more arguments than are expected of the command AND when the user
 		// enters more characters in the command than are checked
 
 		if (stringCompare(cmdString, cmdType)) {
+			argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			type(arg1);
 		}
 		else if (stringCompare(cmdString, cmdExec)) {
+			argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			exec(arg1);
 		}
@@ -62,15 +69,18 @@ int main()
             		dir();
         	}
 		else if (stringCompare(cmdString, cmdDel)) {
+			argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			del(arg1);
 		}
 		else if (stringCompare(cmdString, cmdCopy)) {
+			argErrorHandler(argNum, 2);
 			argFinder(userInput, arg1, 1);
 			argFinder(userInput, arg2, 2);
 			copy(arg1, arg2);
 		}
 		else if (stringCompare(cmdString, cmdCreate)) {
+			argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			create(arg1);
 		}
@@ -204,25 +214,48 @@ void create(char* filename)
 }
 
 // I don't like that we're mixing [] and * since in this context they mean the same thing
-int stringCompare(char given[], char* compared_to)
+int stringCompare(char given[], char goal[])
 {
 	int i = 0;
-	while(given[i] != '\0' && compared_to[i] != '\0') {
-		if (given[i] != compared_to[i])
+	/*
+	int givenLength, goalLength;
+
+	for (i = 0; given[i] != '\0'; i++)
+		givenLength++;
+	for (i = 0; goal[i] != '\0'; i++)
+		goalLength++;
+
+	// If the two strings are different lengths, return 0
+	if (givenLength != goalLength)
+		return 0;
+	*/
+
+	// If any characters don't match, return 0
+	for (i = 0; given[i] != '\0' && goal[i] != '\0'; i++)
+		if (given[i] != goal[i])
 			return 0;
-		i++;
-	}
 
 	return 1;
 }
 
-void numOfArgs(char* input, int* args)
+
+int numberOfArguments(char* input)
 {
-	int argumentIndex;
-	*args = 0;
+	int argumentIndex, args;
 	for (argumentIndex = 0; input[argumentIndex] != '\0'; argumentIndex++)
 		if (input[argumentIndex] == ' ')
-			++*args;
+			++args;
+	return args;
+}
+
+void argErrorHandler(int givenNumOfArgs, int expectedNumOfArgs)
+{
+	// Prints "Too many arguments" every time for some reason
+	if (givenNumOfArgs > expectedNumOfArgs)
+		syscall(0, "Too many arguments\r\n");
+	else if (givenNumOfArgs < expectedNumOfArgs)
+		syscall(0, "Not enough arguments\r\n");
+	syscall(5);
 }
 
 void argFinder(char* input, char* output, int whichArg)
@@ -234,6 +267,12 @@ void argFinder(char* input, char* output, int whichArg)
 
 	while (input[inputIndex] != '\0') {
 		if (input[inputIndex] == ' ') {
+			argumentIndex++;
+			inputIndex++;
+			continue;
+		}
+
+		if (input[inputIndex] == '\r') {
 			argumentIndex++;
 			inputIndex++;
 			continue;
