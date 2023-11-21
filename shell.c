@@ -21,7 +21,7 @@ int main()
 	while(1) {
 		char userInput[LINE_SIZE];
 		char cmdString[12];
-		char arg1[12], arg2[12], arg3[12], arg4[12];
+		char arg1[12], arg2[12];
 
 		char* cmdType = "type";
 		char* cmdExec = "exec";
@@ -96,7 +96,7 @@ void exec(char* inputFileName)
 
 void dir()
 {
-	char directory_buffer[SECTOR_SIZE], file_buffer[10];
+	char directory_buffer[SECTOR_SIZE], file_buffer[12];
 	int i = 0;
 
 	int file_size = 0;
@@ -163,25 +163,28 @@ void create(char* filename)
 	char stringStore[LINE_SIZE];
 	char buffer[SECTOR_SIZE * MAX_SECTORS];
 	int i;
-	int heeheehoohoo = 1;
 	int sectorNumber = 1;
 	int sectorIndex = 0;
 
 	// We need to continue reading a line until the user doesn't enter anything
-	while (heeheehoohoo) {
+	while (1) {
 		syscall(1, stringStore);
-		for (i = 0; buffer[i] != '\n'; i++) {
+
+		if (stringStore[0] == '\r')
+			break;
+
+		// I think this loop is where it doesn't work
+		for (i = 0; buffer[i] != '\r'; i++) {
 			buffer[i] = stringStore[i];
 			sectorIndex++;
-			if (i == 0 && stringStore[i] == '\r') {
-				heeheehoohoo = 0;
-			}
 		}
+
 		if (sectorIndex == SECTOR_SIZE) {
 			sectorNumber++;
 			sectorIndex = 0;
 		}
 	}
+
 	if (sectorIndex > 0)
 		syscall(8, buffer, filename, sectorNumber);
 	else
