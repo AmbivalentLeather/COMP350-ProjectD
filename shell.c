@@ -13,6 +13,12 @@ void del(char* address);
 void copy(char* file1, char* file2);
 void create(char* filename);
 
+int stringLength(char* inputString);
+int mod(int inputNum, int modNum);
+void itoa(int inputNum, char* outputString);
+void stringReverse(char* inputString, int strLen);
+
+
 #define LINE_SIZE 80
 #define SECTOR_SIZE 512
 #define MAX_SECTORS 26
@@ -56,12 +62,12 @@ int main()
 		// enters more characters in the command than are checked
 
 		if (stringCompare(cmdString, cmdType)) {
-			argErrorHandler(argNum, 1);
+			//argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			type(arg1);
 		}
 		else if (stringCompare(cmdString, cmdExec)) {
-			argErrorHandler(argNum, 1);
+			//argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			exec(arg1);
 		}
@@ -69,18 +75,18 @@ int main()
             		dir();
         	}
 		else if (stringCompare(cmdString, cmdDel)) {
-			argErrorHandler(argNum, 1);
+			//argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			del(arg1);
 		}
 		else if (stringCompare(cmdString, cmdCopy)) {
-			argErrorHandler(argNum, 2);
+			//argErrorHandler(argNum, 2);
 			argFinder(userInput, arg1, 1);
 			argFinder(userInput, arg2, 2);
 			copy(arg1, arg2);
 		}
 		else if (stringCompare(cmdString, cmdCreate)) {
-			argErrorHandler(argNum, 1);
+			//argErrorHandler(argNum, 1);
 			argFinder(userInput, arg1, 1);
 			create(arg1);
 		}
@@ -124,6 +130,8 @@ void dir()
 	int file_size = 0;
 	int file_entry = 0;
 
+	char fileSizeStr[10];
+
 	syscall(2, directory_buffer, 2);
 
 	for (file_entry = 0; file_entry < SECTOR_SIZE; file_entry += 32){
@@ -140,11 +148,12 @@ void dir()
 				//syscall(0, "H");
 				i++;
 			}
-			//syscall(0, "\n\r");
-			// */
 			syscall(0, file_buffer);
-			//syscall(0, "\t");
-			//syscall(0, 30);
+			syscall(0, "\t");
+
+			itoa(file_size, fileSizeStr);
+			syscall(0, fileSizeStr);
+
 			syscall(0, "\n\r");
 			i = 0;
 		}
@@ -213,22 +222,12 @@ void create(char* filename)
 	syscall(8, buffer, filename, sectorNumber);
 }
 
-// I don't like that we're mixing [] and * since in this context they mean the same thing
 int stringCompare(char given[], char goal[])
 {
 	int i = 0;
-	/*
-	int givenLength, goalLength;
 
-	for (i = 0; given[i] != '\0'; i++)
-		givenLength++;
-	for (i = 0; goal[i] != '\0'; i++)
-		goalLength++;
-
-	// If the two strings are different lengths, return 0
-	if (givenLength != goalLength)
+	if (stringLength(given) != stringLength(goal))
 		return 0;
-	*/
 
 	// If any characters don't match, return 0
 	for (i = 0; given[i] != '\0' && goal[i] != '\0'; i++)
@@ -237,6 +236,50 @@ int stringCompare(char given[], char goal[])
 
 	return 1;
 }
+
+// From here to the next !! is an attempt at 
+int mod(int inputNum, int modNum)
+{
+	return inputNum - (inputNum/modNum * modNum);
+}
+
+void itoa(int inputNum, char* outputString)
+{
+	int i = 0;
+	int holder;
+
+	while (inputNum != 0) {
+		holder = mod(inputNum, 10);
+		holder += '0';
+		outputString[i] = holder;
+		inputNum = (inputNum - mod(inputNum, 10)) / 10;
+	}
+	stringReverse(outputString, stringLength(outputString));
+}
+
+void stringReverse(char* inputString, int strLen)
+{
+	int high = 0;
+	char output[7];
+	while (inputString[high] != '\0') {
+		output[strLen - high]  = inputString[high];
+		high++;
+	}
+	for (high = 0; inputString[high] != '\0'; high++) {
+		inputString[high] = output[high];
+	}
+}
+
+int stringLength(char* inputString)
+{
+	int stringLength = 0;
+	while (inputString[stringLength] != '\0') {
+		stringLength++;
+	}
+	return stringLength;
+}
+// !!
+// */
 
 
 int numberOfArguments(char* input)
